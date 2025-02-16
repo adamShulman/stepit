@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:stepit/challenges/game_01_steps.dart';
 import 'package:stepit/challenges/tmp_game_01.dart';
 import 'package:stepit/classes/game.dart';
-import 'package:stepit/classes/pip_mode_notifier.dart';
 
 class ChallengePage extends StatefulWidget {
   final Game game;
@@ -48,11 +47,6 @@ void _showCompletionDialog(BuildContext context) {
 
   @override
   Widget build(BuildContext context) {
-    final pipModeNotifier = Provider.of<PipModeNotifier>(context);
-
-    if (pipModeNotifier.inPipMode){
-      return pipModeNotifier.setPipModeImg();
-    }
 
     if (checkChallengeCompleted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

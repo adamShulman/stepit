@@ -12,7 +12,6 @@ import 'package:stepit/challenges/game_09_steps.dart';
 import 'package:stepit/challenges/game_10_speed.dart';
 import 'package:stepit/challenges/game_11_time.dart';
 import 'package:stepit/challenges/game_12_km.dart';
-import 'package:stepit/classes/pip_mode_notifier.dart';
 import 'package:stepit/classes/user.dart';
 import 'package:stepit/classes/game.dart';
 import 'package:stepit/features/picture_challenge.dart';
@@ -40,38 +39,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    final pipModeNotifier =
-        Provider.of<PipModeNotifier>(context, listen: false);
-    pipModeNotifier.floating.dispose();
+  
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
-    final pipModeNotifier =
-        Provider.of<PipModeNotifier>(context, listen: false);
-    if (lifecycleState == AppLifecycleState.inactive) {
-      if (inPausedState) {
-        inPausedState = false;
-        return;
-      }
-      print('App is in inactive state!!!');
-      pipModeNotifier.enablePip(context);
-      pipModeNotifier.inPipMode = true;
-    }
-    if (lifecycleState == AppLifecycleState.resumed &&
-        pipModeNotifier.inPipMode) {
-      if (inPausedState) {
-        inPausedState = false;
-      }
-      setState(() {
-        pipModeNotifier.inPipMode = false;
-      });
-    }
-    if (lifecycleState == AppLifecycleState.paused) {
-      print('App is in background!!!');
-      inPausedState = true;
-    }
+
   }
 
   Card challegeButton(int button_index, user, gameProvider, context) {
@@ -235,12 +209,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // final pipModeNotifier =
-    //     Provider.of<PipModeNotifier>(context, listen: false);
-
-    // if (pipModeNotifier.inPipMode) {
-    //   return pipModeNotifier.setPipModeImg();
-    // }
 
     User? user = Provider.of<UserProvider>(context).user;
     GameProvider? gameProvider = Provider.of<GameProvider>(context);
@@ -265,11 +233,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return PopScope(
         canPop: false,
         onPopInvoked: (bool didPop) async {
-          // Call your method to enter PiP mode here
-          // pipModeNotifier.inPipMode =
-          //     true; // Assuming this is how you trigger PiP mode
-          // return pipModeNotifier.enablePip(
-          //     context); // Prevents the app from exiting or going back
+        
         },
         child: FutureBuilder<User?>(
           future: loadUser(context),
@@ -313,11 +277,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return PopScope(
         canPop: false,
         onPopInvoked: (bool didPop) async {
-          // Call your method to enter PiP mode here
-          // pipModeNotifier.inPipMode =
-          //     true; // Assuming this is how you trigger PiP mode
-          // return pipModeNotifier.enablePip(
-          //     context); // Prevents the app from exiting or going back
+         
         },
         child: FutureBuilder(
           future: gameProvider.loadGames(user, context),
@@ -346,11 +306,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return PopScope(
         canPop: false,
         onPopInvoked: (bool didPop) async {
-          // Call your method to enter PiP mode here
-          // pipModeNotifier.inPipMode =
-          //     true; // Assuming this is how you trigger PiP mode
-          // return pipModeNotifier.enablePip(
-          //     context); // Prevents the app from exiting or going back
+         
         },
         child: const Center(
           child: SizedBox(
@@ -366,11 +322,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return PopScope(
         canPop: false,
         onPopInvoked: (bool didPop) async {
-          // Call your method to enter PiP mode here
-          // pipModeNotifier.inPipMode =
-          //     true; // Assuming this is how you trigger PiP mode
-          // return pipModeNotifier.enablePip(
-          //     context); // Prevents the app from exiting or going back
+          
         },
         child: Scaffold(
           appBar: AppBar(

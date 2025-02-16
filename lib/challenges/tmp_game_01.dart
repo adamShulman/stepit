@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/game.dart';
-import 'package:stepit/classes/pip_mode_notifier.dart';
 import 'package:stepit/features/step_count.dart';
 
 class Game_01_steps_tmp extends StatefulWidget {
@@ -57,11 +56,7 @@ class _Game_01_steps_tmp extends State<Game_01_steps_tmp> {
 
   @override
   Widget build(BuildContext context) {
-    final pipModeNotifier = Provider.of<PipModeNotifier>(context);
-
-    if (pipModeNotifier.inPipMode) {
-      return pipModeNotifier.setPipModeImg();
-    }
+ 
     return Scaffold(
       appBar: AppBar(
         title: Row(

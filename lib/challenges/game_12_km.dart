@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:pedometer/pedometer.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/game.dart';
-import 'package:stepit/classes/pip_mode_notifier.dart';
 import 'package:stepit/features/step_count.dart';
 
 class Game_12_km extends StatefulWidget {
@@ -119,11 +117,7 @@ class _Game_12_kmState extends State<Game_12_km> {
 
   @override
   Widget build(BuildContext context) {
-    final pipModeNotifier = Provider.of<PipModeNotifier>(context);
 
-    if (pipModeNotifier.inPipMode) {
-      return pipModeNotifier.setPipModeImg();
-    }
     return WillPopScope(
       onWillPop: () async {
         if (challengeStarted) {

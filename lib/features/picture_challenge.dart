@@ -10,7 +10,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/cam_mode_notifier.dart';
 import 'package:stepit/classes/game.dart';
-import 'package:stepit/classes/pip_mode_notifier.dart';
 import 'package:stepit/pages/homepage.dart';
 import 'globals.dart';
 import 'package:intl/intl.dart';
@@ -59,31 +58,6 @@ class _TakePictureScreenState extends State<TakePictureScreen>
     userID = userID.padLeft(6, '0');
     _loadImagePaths();
   }
-
-  // @override
-  // void dispose() {
-  //   WidgetsBinding.instance.removeObserver(this);
-  //   final pipModeNotifier = Provider.of<PipModeNotifier>(context, listen: false);
-  //   pipModeNotifier.floating.dispose();
-  //   final camModeNotifier = Provider.of<CamModeNotifier>(context, listen: false);
-  //   camModeNotifier.floating.dispose();
-  //   super.dispose();
-  // }
-
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
-  //   final pipModeNotifier = Provider.of<PipModeNotifier>(context, listen: false);
-  //   final camModeNotifier = Provider.of<CamModeNotifier>(context, listen: false);
-  //   if (lifecycleState == AppLifecycleState.inactive && !camModeNotifier.inCamMode) {
-  //     pipModeNotifier.enablePip(context);
-  //     pipModeNotifier.inPipMode = true;
-  //   }
-  //   if (lifecycleState == AppLifecycleState.resumed && pipModeNotifier.inPipMode) {
-  //     setState(() {
-  //       pipModeNotifier.inPipMode = false;
-  //     });
-  //   }
-  // }
 
   void _loadImagePaths() async {
     final querySnapshot = await FirebaseFirestore.instance
@@ -224,11 +198,6 @@ class _TakePictureScreenState extends State<TakePictureScreen>
 
   @override
   Widget build(BuildContext context) {
-    final pipModeNotifier = Provider.of<PipModeNotifier>(context);
-
-    if (pipModeNotifier.inPipMode) {
-      return pipModeNotifier.setPipModeImg();
-    }
 
     return Scaffold(
       appBar: AppBar(

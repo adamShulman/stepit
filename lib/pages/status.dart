@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stepit/classes/pip_mode_notifier.dart';
 import 'package:stepit/classes/user.dart';
 
 class StatusPage extends StatefulWidget {
@@ -21,11 +20,6 @@ class _StatusPageState extends State<StatusPage> {
 
   @override
   Widget build(BuildContext context) {
-    final pipModeNotifier = Provider.of<PipModeNotifier>(context);
-
-    if (pipModeNotifier.inPipMode) {
-      return pipModeNotifier.setPipModeImg();
-    }
 
     User? user = Provider.of<UserProvider>(context).user;
     return Scaffold(

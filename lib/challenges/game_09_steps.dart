@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/game.dart';
-import 'package:stepit/classes/pip_mode_notifier.dart';
 import 'package:stepit/features/step_count.dart';
 
 class Game_09_steps extends StatefulWidget {
@@ -75,11 +74,7 @@ class _Game_09_steps extends State<Game_09_steps> {
 
   @override
   Widget build(BuildContext context) {
-    final pipModeNotifier = Provider.of<PipModeNotifier>(context);
 
-    if (pipModeNotifier.inPipMode) {
-      return pipModeNotifier.setPipModeImg();
-    }
     return Scaffold(
       appBar: AppBar(
         title: Row(
