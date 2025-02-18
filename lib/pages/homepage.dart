@@ -12,10 +12,15 @@ import 'package:stepit/challenges/game_09_steps.dart';
 import 'package:stepit/challenges/game_10_speed.dart';
 import 'package:stepit/challenges/game_11_time.dart';
 import 'package:stepit/challenges/game_12_km.dart';
+import 'package:stepit/classes/challenge.dart';
 import 'package:stepit/classes/user.dart';
 import 'package:stepit/classes/game.dart';
 import 'package:stepit/features/picture_challenge.dart';
-import 'package:stepit/pages/status.dart';
+import 'package:stepit/services/firebase_service.dart';
+import 'package:stepit/utils/utils.dart';
+import 'package:stepit/widgets/background_gradient_container.dart';
+import 'package:stepit/widgets/daily_step_counter.dart';
+import 'package:stepit/widgets/challenge_cards.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,14 +30,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+
   final ScrollController _scrollController = ScrollController();
+  final FirestoreService _firestoreService = FirestoreService();
+
   bool inPausedState = false;
+
+  final List challenges = [
+    StepsChallenge(id: 1, name: "Steps Challenge", description: "You must walked away", level: 1, challengeType: ChallengeType.steps, startTime: DateTime.now(), targetSteps: 100),
+    DistanceChallenge(id: 2, name: "Steps Challenge", description: "You must walked away", level: 1, challengeType: ChallengeType.distance, startTime: DateTime.now(), requiredPhotos: 100, stepLimit: 10),
+    DurationChallenge(id: 3, name: "Steps Challenge", description: "You must walked away", level: 1, challengeType: ChallengeType.duration, startTime: DateTime.now(), targetSteps: 100)
+  ];
+
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    //DataBase.loadUser();
+    // DataBase.loadUser();
     //SharedPreferences prefs =  SharedPreferences.getInstance() as SharedPreferences;
   }
 
@@ -52,7 +67,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Game game = gameProvider.games[button_index];
     return Card(
       margin: const EdgeInsets.all(8.0), // Add some margin if you want
-      color: Color.fromARGB(255, 103, 187, 136),
+      color: const Color(0xFFC7F9CC),
       child: InkWell(
         onTap: () {
           if (user!.gameType == 'Influence') {
@@ -213,21 +228,98 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     User? user = Provider.of<UserProvider>(context).user;
     GameProvider? gameProvider = Provider.of<GameProvider>(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        final double screenWidth = MediaQuery.of(context).size.width;
-        const double tileWidth = 210.0;
-        const double padding = 8.0;
-        final double targetOffset =
-            tileWidth + 2 * padding + tileWidth / 2 - screenWidth / 2;
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        // backgroundColor: Colors.transparent,
+        centerTitle: false,
+        automaticallyImplyLeading: false,
+        title: const Text(
+          'Choose a challenge',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 25.0,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                offset: Offset(1.0, -1.0),
+                blurRadius: 1.0,
+                color: Colors.white
+              ),
+            ],
+          )
+        ),
+      ),
+      body: BackgroundGradientContainer(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              DailyStepCounter(),
 
-        _scrollController.animateTo(
-          targetOffset,
-          curve: Curves.easeOut,
-          duration: const Duration(milliseconds: 1000),
-        );
-      }
-    });
+              StreamBuilder<List<Challenge>>(
+                stream: _firestoreService.fetchChallenges(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No users found"));
+                  }
+                  final challengesss = snapshot.data!;
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: challengesss.length,
+                    itemBuilder: (context, index) {
+                      final challenge = challengesss[index];
+                      return Hero(
+                        tag: challenge.id,
+                        child: ChallengeUtils.buildChallengeWidget(
+                          challenge,
+                          canNavigate: true
+                        )
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      )
+      
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     // await _firestoreService.addUser("New User", "newuser@example.com");
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
+    );
+  }
+
+  /*
+
+  @override
+  Widget build(BuildContext context) {
+
+    User? user = Provider.of<UserProvider>(context).user;
+    GameProvider? gameProvider = Provider.of<GameProvider>(context);
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (_scrollController.hasClients) {
+    //     final double screenWidth = MediaQuery.of(context).size.width;
+    //     const double tileWidth = 210.0;
+    //     const double padding = 8.0;
+    //     final double targetOffset =
+    //         tileWidth + 2 * padding + tileWidth / 2 - screenWidth / 2;
+
+    //     _scrollController.animateTo(
+    //       targetOffset,
+    //       curve: Curves.easeOut,
+    //       duration: const Duration(milliseconds: 1000),
+    //     );
+    //   }
+    // });
 
     if (user == null) {
       return PopScope(
@@ -334,9 +426,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             //     );
             //   },
             // ),
-            centerTitle: true,
+            centerTitle: false,
             automaticallyImplyLeading: false,
-            title: const Text('Choose a Challenge'),
+            title: const Text(
+              'Choose a challenge',
+              style: TextStyle(
+                color: Colors.black,
+                textBaseline: TextBaseline.alphabetic,
+                fontSize: 25.0,
+                fontWeight: FontWeight.bold,
+                // shadows: [
+                //   Shadow(
+                //     offset: Offset(1.0, 1.0),
+                //     blurRadius: 1.0,
+                //     color: Color.fromARGB(255, 0, 0, 0),
+                //   ),
+                // ],
+              )
+            ),
           ),
           // drawer: Drawer(
           //   backgroundColor: const Color.fromARGB(255, 184, 239, 186),
@@ -417,20 +524,71 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           //     ),
           //   ),
           // ),
-          body: Padding(
+          body: Container(
             padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: const [
+                  0.01,
+                  0.29,
+                  0.48,
+                  0.67,
+                  0.98
+                ],
+                colors: [
+                  const Color(0xFFC7F9CC),
+                  const Color(0xFF80ED99),
+                  const Color(0xFF57CC99),
+                  const Color(0xFF38A3A5),
+                  const Color(0xFF22577A),
+                ]
+              )
+            ),
+            // child: ListView.builder(
+            //   itemCount: challenges.length,
+            //   itemBuilder: (context, index) {
+            //     final challenge = challenges[index];
+            //     return Hero(
+            //       tag: challenge.id,
+            //       child: _buildChallengeWidget(challenge)
+            //     );
+            //   },
+            // ),
+            // child: SingleChildScrollView(
+            //   child: Column(
+            //     children: [
+            //       DailyStepCounter(),
+            //       ListView.builder(
+            //         shrinkWrap: true,
+            //         physics: const NeverScrollableScrollPhysics(),
+            //         itemCount: challenges.length,
+            //         itemBuilder: (context, index) {
+            //           final challenge = challenges[index];
+            //           return Hero(
+            //             tag: challenge.id,
+            //             child: _buildChallengeWidget(challenge)
+            //           );
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // )
             child: Flex(
               direction: Axis.vertical,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                const SizedBox(height: 30),
-                const SizedBox(height: 10),
+                
                 Flexible(
                   flex: 10000,
                   child: Expanded(
                     child: SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
+                          
+                          DailyStepCounter(),
+                          const SizedBox(height: 24.0),
                           challegeButton(0, user, gameProvider, context),
                           const SizedBox(height: 20),
                           challegeButton(1, user, gameProvider, context),
@@ -459,6 +617,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       );
     }
   }
+
+  */
 }
 
 

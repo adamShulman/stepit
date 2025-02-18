@@ -8,6 +8,7 @@ import 'package:stepit/features/step_count.dart';
 import 'package:stepit/pages/agreement.dart';
 import 'package:stepit/pages/homepage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:stepit/widgets/background_gradient_container.dart';
 import 'package:workmanager/workmanager.dart';
 import 'firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,15 +21,15 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-    await Workmanager().initialize(
-    callbackDispatcher,
-    isInDebugMode: true,
-  );
-  await Workmanager().registerPeriodicTask(
-    '1',
-    'stepCountTask',
-    frequency: Duration(minutes: 15),
-  );
+  //   await Workmanager().initialize(
+  //   callbackDispatcher,
+  //   isInDebugMode: true,
+  // );
+  // await Workmanager().registerPeriodicTask(
+  //   '1',
+  //   'stepCountTask',
+  //   frequency: Duration(minutes: 15),
+  // );
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstTime = prefs.getBool('first_time') ?? true;
   //bool isFirstTime = true;
@@ -39,7 +40,7 @@ void main() async {
       ChangeNotifierProvider(create: (context) => StepCounterProvider()),
       ChangeNotifierProvider(create: (context) => UserProvider()),
       ChangeNotifierProvider(create: (context) => GameProvider()),
-      ChangeNotifierProvider(create: (context) => CamModeNotifier())// Add this line
+      ChangeNotifierProvider(create: (context) => CamModeNotifier())
     ],
     child: MyApp(isFirstTime: isFirstTime),
   ));
@@ -76,35 +77,34 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData(
-          // Define the default brightness and colors.
-          brightness: Brightness.light,
-          primaryColor: Colors.lightBlue[800],
-          hintColor: Colors.cyan[600],
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 184, 239, 186), // Set your desired color here
-              textStyle: const TextStyle(
-                fontSize: 15,
-                color: Color.fromARGB(255, 255, 255, 255),
-                
-              ),
+      theme: ThemeData(
+        // Define the default brightness and colors.
+        brightness: Brightness.light,
+        primaryColor: Colors.lightBlue[800],
+        hintColor: Color(0xFFC7F9CC),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 184, 239, 186), // Set your desired color here
+            textStyle: const TextStyle(
+              fontSize: 15,
+              color: Color.fromARGB(255, 255, 255, 255),
+              
             ),
-          ),          
-          appBarTheme: const AppBarTheme(
-            color: Color.fromARGB(255, 184, 239, 186), // Set your desired color here
           ),
-          // Define the default TextTheme. Use this to specify the default
-          // text styling for headlines, titles, bodies of text, and more.
-          // textTheme: TextTheme(
-          //   headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-          //   headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-          //   bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
-          // ),
+        ),          
+        appBarTheme: const AppBarTheme(
+          color: Color(0xFFC7F9CC), // Set your desired color here
         ),
+        // Define the default TextTheme. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+        // textTheme: TextTheme(
+        //   headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+        //   headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+        //   bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        // ),
+      ),
       debugShowCheckedModeBanner: false,
       home: isFirstTime ? AgreementPage() : HomePage(),
-      // TODO: Add theme:, Learn themes
     );
   }
 }

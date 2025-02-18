@@ -62,7 +62,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "lib/images/stepit_logo_foreground.png"
+  image_path: "assets/images/stepit_logo_foreground.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -83,30 +83,30 @@ flutter:
   uses-material-design: true
 
   assets:
-      - lib/images/walking_sausage.gif
-      - lib/images/stepit_logo.png
-      - lib/images/footsteps.png
-      - lib/images/15.png
-      - lib/images/one-hour.png
-      - lib/images/number-3.png
-      - lib/images/stairs.png
-      - lib/images/sidewalk.png
-      - lib/images/students.png
-      - lib/images/bus-stop.png
-      - lib/images/street-light.png
-      - lib/images/park.png
-      - lib/images/7500_steps.jpg
-      - lib/images/widening.png
-      - lib/images/skyline.png
-      - lib/images/faucet.png
-      - lib/images/crosswalk.png
-      - lib/images/bike.png
-      - lib/images/playground.png
-      - lib/images/shadow.png
-      - lib/images/beautifultree.png
-      - lib/images/dust.png
-      - lib/images/shovels.png
-      - lib/images/relax.png
+    - assets/images/walking_sausage.gif
+    - assets/images/stepit_logo.png
+    - assets/images/footsteps.png
+    - assets/images/15.png
+    - assets/images/one-hour.png
+    - assets/images/number-3.png
+    - assets/images/stairs.png
+    - assets/images/sidewalk.png
+    - assets/images/students.png
+    - assets/images/bus-stop.png
+    - assets/images/street-light.png
+    - assets/images/park.png
+    - assets/images/7500_steps.jpg
+    - assets/images/widening.png
+    - assets/images/skyline.png
+    - assets/images/faucet.png
+    - assets/images/crosswalk.png
+    - assets/images/bike.png
+    - assets/images/playground.png
+    - assets/images/shadow.png
+    - assets/images/beautifultree.png
+    - assets/images/dust.png
+    - assets/images/shovels.png
+    - assets/images/relax.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
