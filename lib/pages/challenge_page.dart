@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:stepit/classes/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/challenge_singleton.dart';
 import 'package:stepit/utils/utils.dart';
 import 'package:stepit/widgets/background_gradient_container.dart';
-import 'package:stepit/widgets/challenge_cards.dart';
 
 class ChallengePages extends StatefulWidget {
 
@@ -45,7 +45,19 @@ class _ChallengePageState extends State<ChallengePages> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Hero(
+            //   tag: widget.challenge.id,
+            //   child: KeyedSubtree(
+            //     key: chKey,
+            //     child: ChallengeUtils.buildChallengeWidget(
+            //       widget.challenge, 
+            //       callback: () => (),
+            //       canNavigate: true
+            //     ),
+            //   )
+            // ),
             Hero(
+              // key: ValueKey(widget.challenge.id),
               tag: widget.challenge.id,
               child: ChallengeUtils.buildChallengeWidget(
                 widget.challenge, 
@@ -55,33 +67,34 @@ class _ChallengePageState extends State<ChallengePages> {
             ),
             // SizedBox(height: 20),
             Padding(
-              padding: EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(12.0),
               child: ElevatedButton(
                 onPressed: () {
+                  if (LazySingleton.instance.anotherChallengeInProgress(widget.challenge.id)) { return; }
+
                   switch (widget.challenge.challengeStatus) {
                     case ChallengeStatus.inactive:
-                      setState(() {
-                        widget.challenge.start();
-                      });
+                      widget.challenge.startChallenge();
                     case ChallengeStatus.active:
-                      setState(() {
-                        widget.challenge.end();
-                      });
+                      widget.challenge.pauseChallenge();
                     case ChallengeStatus.completed:
-                      setState(() {
-                        // widget.challenge.end();
-                      });
+                      break;
+                      // widget.challenge.continueChallenge();
                     case ChallengeStatus.ended:
-                      setState(() {
-                        // widget.challenge.end();
-                      });
+                      break;
+                      // widget.challenge.continueChallenge();
+                    case ChallengeStatus.paused:
+                       widget.challenge.continueChallenge();
                   }
+
+                  setState(() { });
+
                 },
-                  child: Text(buttonText()),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF22577A),
+                    backgroundColor: LazySingleton.instance.isThereActiveChallenge() ? Colors.blueGrey :  const Color(0xFF22577A),
                     foregroundColor: Colors.white
                 ),
+                  child: Text(buttonText()),
               )
             ),
             
@@ -92,16 +105,23 @@ class _ChallengePageState extends State<ChallengePages> {
   }
 
   String buttonText() {
-    switch (widget.challenge.challengeStatus) {
-      case ChallengeStatus.inactive:
-        return "Start Challenge";
-      case ChallengeStatus.active:
-        return "Stop Challenge";
-      case ChallengeStatus.completed:
-        return "Challenge Completed";
-      case ChallengeStatus.ended:
-        return "Challenge Ended";
+    if (LazySingleton.instance.anotherChallengeInProgress(widget.challenge.id)) {
+      return "Another challenge in progress";
+    } else {
+        switch (widget.challenge.challengeStatus) {
+        case ChallengeStatus.inactive:
+          return "Start Challenge";
+        case ChallengeStatus.active:
+          return "Stop Challenge";
+        case ChallengeStatus.completed:
+          return "Challenge Completed";
+        case ChallengeStatus.ended:
+          return "Continue Challenge";
+        case ChallengeStatus.paused:
+          return "Continue Challenge";
+      }
     }
+    
   }
 }
 

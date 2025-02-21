@@ -11,12 +11,13 @@ class BackgroundGradientContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: MediaQuery.of(context).size.height,
       padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          stops: const [
+          stops: [
             0.01,
             0.29,
             0.48,
@@ -24,11 +25,11 @@ class BackgroundGradientContainer extends StatelessWidget {
             0.98
           ],
           colors: [
-            const Color(0xFFC7F9CC),
-            const Color(0xFF80ED99),
-            const Color(0xFF57CC99),
-            const Color(0xFF38A3A5),
-            const Color(0xFF22577A),
+            Color(0xFFC7F9CC),
+            Color(0xFF80ED99),
+            Color(0xFF57CC99),
+            Color(0xFF38A3A5),
+            Color(0xFF22577A),
           ]
         )
       ),

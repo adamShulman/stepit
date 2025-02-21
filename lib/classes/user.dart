@@ -4,6 +4,7 @@ import "package:flutter/foundation.dart";
 import "package:flutter/src/widgets/framework.dart";
 import 'package:provider/provider.dart';
 import "package:shared_preferences/shared_preferences.dart";
+import "package:stepit/classes/challenge_singleton.dart";
 
 class User {
   
@@ -73,8 +74,10 @@ class UserProvider with ChangeNotifier {
   }
 }
 
-void saveUser(BuildContext context, String username, int uniqueNumber, String gameType, int level) async {
+void saveUser(String username, int uniqueNumber, String gameType, int level) async {
   User user = User(username: username, uniqueNumber: uniqueNumber, gameType: gameType, level: level);
+
+  LazySingleton.instance.currentUser = user;
 
   // Save to Firebase
   await FirebaseFirestore.instance.collection('users').doc(uniqueNumber.toString().padLeft(6, '0')).set(user.toMap());
@@ -87,7 +90,7 @@ void saveUser(BuildContext context, String username, int uniqueNumber, String ga
   await prefs.setInt('level', user.level);
 
   // Update user provider
-  Provider.of<UserProvider>(context, listen: false).setUser(user);
+  // Provider.of<UserProvider>(context, listen: false).setUser(user);
 
   // return user;
 }

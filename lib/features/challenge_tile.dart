@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:stepit/challenges/game_01_steps.dart';
-import 'package:stepit/challenges/tmp_game_01.dart';
 import 'package:stepit/classes/game.dart';
 
 class ChallengePage extends StatefulWidget {

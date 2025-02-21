@@ -3,12 +3,37 @@ import 'package:stepit/pages/Identification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AgreementPage extends StatefulWidget {
+
+  
+  const AgreementPage({ super.key });
+  
   @override
-  _AgreementPageState createState() => _AgreementPageState();
+  State createState() => _AgreementPageState();
 }
 
 class _AgreementPageState extends State<AgreementPage> {
+
   bool _agreed = false;
+
+  Future<void> _saveAndNavigateToIdentification() async {
+
+    if (_agreed == false) { return ;}
+
+    try {
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('first_time', false);
+
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const IdentificationPage()),
+        );
+      }
+
+    } catch (e) {
+      print("Error during async tasks: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,18 +128,7 @@ class _AgreementPageState extends State<AgreementPage> {
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: _agreed ? () async
-                          {
-                              SharedPreferences prefs = await SharedPreferences.getInstance();
-                              await prefs.setBool('first_time', false);
-                
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => IdentificationPage()),
-                              );
-                            }
-                          : null,
+                      onPressed: () => _saveAndNavigateToIdentification(),
                       child: const Text('Next'),
                     ),
                   ],

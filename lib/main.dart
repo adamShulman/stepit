@@ -1,63 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stepit/background/steps_tracking_wm.dart';
 import 'package:stepit/classes/cam_mode_notifier.dart';
 import 'package:stepit/classes/game.dart';
 import 'package:stepit/classes/user.dart';
-import 'package:stepit/features/step_count.dart';
-import 'package:stepit/pages/agreement.dart';
-import 'package:stepit/pages/homepage.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:stepit/widgets/background_gradient_container.dart';
-import 'package:workmanager/workmanager.dart';
+import 'package:stepit/pages/data_loader.dart';
 import 'firebase_options.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-// import 'package:stepit/background/steps_tracking.dart';
-//final userProviderKey = GlobalKey();
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  //   await Workmanager().initialize(
-  //   callbackDispatcher,
-  //   isInDebugMode: true,
-  // );
-  // await Workmanager().registerPeriodicTask(
-  //   '1',
-  //   'stepCountTask',
-  //   frequency: Duration(minutes: 15),
-  // );
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool isFirstTime = prefs.getBool('first_time') ?? true;
-  //bool isFirstTime = true;
 
   
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => StepCounterProvider()),
+      // ChangeNotifierProvider(create: (context) => StepCounterProvider()),
       ChangeNotifierProvider(create: (context) => UserProvider()),
       ChangeNotifierProvider(create: (context) => GameProvider()),
       ChangeNotifierProvider(create: (context) => CamModeNotifier())
     ],
-    child: MyApp(isFirstTime: isFirstTime),
+    child: const MyApp(),
   ));
 }
 
 class MyApp extends StatefulWidget {
-  final bool isFirstTime;
-  const MyApp({superKey, Key? key, required this.isFirstTime});
+
+  const MyApp({ super.key });
+
   @override
-  MyAppState createState() => MyAppState(isFirstTime: isFirstTime);
+  MyAppState createState() => MyAppState();
+  
 }
 
 class MyAppState extends State<MyApp> {
 
-  static AppLifecycleState _appLifecycleState = AppLifecycleState.resumed;
-  final bool isFirstTime;
-  MyAppState({Key? key, required this.isFirstTime});
+  MyAppState({ Key? key });
+
+  static const AppLifecycleState _appLifecycleState = AppLifecycleState.resumed;
 
   @override
   void initState() {
@@ -81,7 +64,7 @@ class MyAppState extends State<MyApp> {
         // Define the default brightness and colors.
         brightness: Brightness.light,
         primaryColor: Colors.lightBlue[800],
-        hintColor: Color(0xFFC7F9CC),
+        hintColor: const Color(0xFFC7F9CC),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color.fromARGB(255, 184, 239, 186), // Set your desired color here
@@ -104,7 +87,8 @@ class MyAppState extends State<MyApp> {
         // ),
       ),
       debugShowCheckedModeBanner: false,
-      home: isFirstTime ? AgreementPage() : HomePage(),
+      home: const DataLoaderPage(),
     );
   }
 }
+

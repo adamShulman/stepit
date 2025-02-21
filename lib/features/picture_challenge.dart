@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/cam_mode_notifier.dart';
 import 'package:stepit/classes/game.dart';
-import 'package:stepit/pages/homepage.dart';
 import 'globals.dart';
 import 'package:intl/intl.dart';
 

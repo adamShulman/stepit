@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import "package:stepit/background/steps_tracking_wm.dart";
 import 'package:stepit/classes/database.dart';
 import 'package:stepit/pages/homepage.dart';
 import 'package:stepit/classes/user.dart';
 
 class IdentificationPage extends StatefulWidget {
+
+  const IdentificationPage({ super.key });
+
   @override
-  _IdentificationPageState createState() => _IdentificationPageState();
+  State createState() => _IdentificationPageState();
+
 }
 
 class _IdentificationPageState extends State<IdentificationPage> {
@@ -52,10 +55,31 @@ class _IdentificationPageState extends State<IdentificationPage> {
   //   return DataBase.userExists(uniqueNumber);
   // }
 
-  void _saveToFirestore(BuildContext context) async {
+  void _saveToFirestore() async {
     int uniqueNumber = await _uniqueNumber;
     String gameType =  _gameType;
-    saveUser(context, _username, uniqueNumber, gameType, 1);
+    saveUser(_username, uniqueNumber, gameType, 1);
+  }
+
+  Future<void> _saveAndNavigateHome() async {
+
+    if (connectionState == false) { return; }
+
+    try {
+
+      _saveToFirestore();
+      // startStepsTracking();
+      //loadUser(context).then((_) => startStepsTracking());
+
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
+
+    } catch (e) {
+      print("Error during async tasks: $e");
+    }
   }
 
   @override
@@ -115,17 +139,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: connectionState
-                      ? () {
-                          _saveToFirestore(context);
-                          startStepsTracking();
-                          //loadUser(context).then((_) => startStepsTracking());
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => HomePage()),
-                          );
-                        }
-                      : null,
+                  onPressed: () => _saveAndNavigateHome(),
                   child: const Text(
                     "Continue",
                     style: TextStyle(

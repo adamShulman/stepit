@@ -1,11 +1,7 @@
-import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:stepit/classes/database.dart';
 import 'package:stepit/features/step_count.dart';
-import 'package:stepit/firebase_options.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:stepit/features/globals.dart';
@@ -88,9 +84,9 @@ void callbackDispatcher() {
 
 Future<void> setAndSaveSteps () async {
   // // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 
   int steps;
   

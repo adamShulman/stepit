@@ -1,5 +1,4 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:stepit/classes/objects.dart';
 
 FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
