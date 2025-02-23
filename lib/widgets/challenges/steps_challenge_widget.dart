@@ -1,136 +1,105 @@
 
-
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/steps_challenge.dart';
+import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
 
 class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
   
-  const StepsChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback});
+  const StepsChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
 
   @override
-  Widget buildContent() {
+  Widget buildContent(BuildContext context) {
+    
+    final stepService = context.watch<StepTrackerServiceNotifier>();
+    challenge.progress = stepService.currentSteps;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Target Steps: ${challenge.targetSteps}"),
-        Text("Progress: ${challenge.progress ?? 0} steps"),
+        Text("Progress: ${stepService.currentSteps} steps"),
+        // _StepProgress(),
         Text("Started time: ${challenge.getFormattedStartTime() ?? 0}"),
       ],
     );
   }
 
   @override
-  ChallengeCardState<ChallengeCard<Challenge>> createState() => _StepsChallengeCardState();
+  ChallengeCardState<ChallengeCard<Challenge>> createState() => StepsChallengeCardState();
   
 }
 
-class _StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
+class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
   int _stepCount = 0;
+  bool _isTracking = false;
 
-  Timer? _timer;
+  // @override
+  // Widget build(BuildContext context) {
+  //   context.watch<StepTrackerServiceNotifier>();
+  //   return Consumer<StepTrackerServiceNotifier>(
+  //     builder: (context, stepService, child) {
+  //       // Ensure the challenge model is updated with the latest steps before building the widget
+  //       widget.challenge.progress = stepService.currentSteps;
 
-  bool isActive = false;
-  
-  late StreamSubscription _periodicSub;
+  //       return super.build(context);  // Return the widget tree
+  //     },
+  //   );
+  // }
+
 
   @override
   void initState() {
-
-    _periodicSub = Stream.periodic(const Duration(milliseconds: 1000)).listen((_) {
-
-      switch (widget.challenge.challengeStatus) {
-        case ChallengeStatus.inactive:
-          isActive = false;
-          
-        case ChallengeStatus.active:
-          if (isActive) {
-
-          } else {
-            isActive = true;
-            _startChallenge();
-          }
-          
-        case ChallengeStatus.completed:
-          if (isActive) {
-            isActive = false;
-            _completeChallenge();
-          }
-         
-        case ChallengeStatus.ended:
-        if (isActive) {
-            isActive = false;
-            _endChallenge();
-          }
-
-          case ChallengeStatus.paused:
-          if (isActive) {
-            isActive = false;
-            _pauseChallenge();
-          }
-         
-      }
-     
-    });
-    
     super.initState();
-  }
-
-  void _startTimer() {
-    const oneSecond = Duration(seconds: 1);
-
-    _timer = Timer.periodic(oneSecond, (timer) {
-      // widget.challenge.progress += 1;
-    setState(() {
-      widget.challenge.progress += 1;
-    });
-       
-    });
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _periodicSub.cancel();
     super.dispose();
   }
 
-  // void _updateFirebase() {
+  @override
+  void pauseChallenge() {
+    super.pauseChallenge();
 
-  //   final userProvider = Provider.of<UserProvider>(context, listen: false);
+    _isTracking = false;
+    context.read<StepTrackerServiceNotifier>().pauseTracking();
+  }
+  
+  @override
+  void startChallenge() {
+    super.startChallenge();
 
-  //   CollectionReference userChallenges = FirebaseFirestore.instance
-  //     .collection("users")
-  //     .doc(userProvider.user?.uniqueNumber.toString().padLeft(6, '0'))
-  //     .collection("userGames");
-
-  //   userChallenges.doc(widget.challenge.id.toString()).set({
-  //     'Completed': widget.challenge.isCompleted(),
-  //     'End Time': widget.challenge.endTime,
-  //     'Steps Taken during Challenge': _stepCount,
-  //     'status': widget.challenge.challengeStatus.description
-  //   });
-  // }
-
-  void _pauseChallenge() {
-    _timer?.cancel();
+    _isTracking = true;
+    context.read<StepTrackerServiceNotifier>().startTracking();
   }
 
-  void _startChallenge() {
-    _startTimer();
+  @override
+  void resumeChallenge() {
+    super.resumeChallenge();
+
+    _isTracking = true;
+    context.read<StepTrackerServiceNotifier>().resumeTracking();
+    
   }
 
-  void _completeChallenge() {
+  @override
+  void endChallenge() {
+    super.endChallenge();
 
-    _timer?.cancel();
+    _isTracking = false;
+    context.read<StepTrackerServiceNotifier>().endTracking();
+  }
 
-    // widget.challenge.challengeStatus = ChallengeStatus.completed;
-    // widget.challenge.endTime = DateTime.now();
+  @override
+  void completeChallenge() {
+    super.completeChallenge();
 
-    // _updateFirebase();
+    _isTracking = false;
+    context.read<StepTrackerServiceNotifier>().completeTracking();
 
     String message;
     message = 'Congratulations! You have completed the challenge.';
@@ -152,21 +121,61 @@ class _StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
     );
   }
 
-  void _endChallenge() {
-
-    
-    _timer?.cancel();
-
-    // widget.challenge.challengeStatus = ChallengeStatus.ended;
-    // widget.challenge.endTime = DateTime.now();
-
-    // _updateFirebase();
-
-  }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //    return super.build(context);
-  // }
-
 }
+
+// class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
+//   const StepsChallengeCard({
+//     super.key,
+//     required super.challenge,
+//     required super.canNavigate,
+//     super.callback,
+//   });
+
+//   @override
+//   Widget buildContent(BuildContext context) {
+//     final stepService = context.watch<StepTrackerServiceNotifier>();
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text("Target Steps: ${challenge.targetSteps}"),
+//         Text("Progress: ${stepService.currentSteps} steps"),
+//         Text("Started time: ${challenge.getFormattedStartTime() ?? 0}"),
+//         // Add StepTrackingButton for start/stop
+//         // _StepTrackingButton(),
+//         // Display the current step count
+//         // _StepProgress(),
+//       ],
+//     );
+//   }
+
+//   @override
+//   ChallengeCardState<ChallengeCard<Challenge>> createState() => _StepsChallengeCardState();
+// }
+
+// class _StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
+
+//   @override
+//   Widget build(BuildContext context) {
+    
+//     // You can use context.watch or Consumer here to watch the state changes
+//     return super.build(context);
+//   }
+
+//   // 
+// }
+
+
+// class _StepProgress extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     final stepService = context.watch<StepTrackerServiceNotifier>();
+
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text('Steps Taken: ${stepService.currentSteps}', style: const TextStyle(fontSize: 16)),
+//         // Optionally, add a progress bar or circular progress indicator here.
+//       ],
+//     );
+//   }
+// }

@@ -7,12 +7,11 @@ class BackgroundGradientContainer extends StatelessWidget {
 
   const BackgroundGradientContainer({super.key, this.child});
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height,
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(0.0),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,

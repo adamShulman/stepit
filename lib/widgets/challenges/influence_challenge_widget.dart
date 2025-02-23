@@ -10,10 +10,10 @@ import 'package:stepit/widgets/challenge_card.dart';
 
 class InfluenceChallengeCard extends ChallengeCard<InfluenceChallenge> {
 
-  const InfluenceChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback});
+  const InfluenceChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
 
   @override
-  Widget buildContent() {
+  Widget buildContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -112,6 +112,11 @@ class _InfluenceChallengeCardState extends ChallengeCardState<InfluenceChallenge
   void _endChallenge() {
 
 
+  }
+  
+  @override
+  void startChallenge() {
+    // TODO: implement startChallenge
   }
 
 }

@@ -16,8 +16,9 @@ class ChallengePages extends StatefulWidget {
 }
 
 class _ChallengePageState extends State<ChallengePages> {
-  
 
+  late void Function() myMethod;
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,56 +46,52 @@ class _ChallengePageState extends State<ChallengePages> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Hero(
-            //   tag: widget.challenge.id,
-            //   child: KeyedSubtree(
-            //     key: chKey,
-            //     child: ChallengeUtils.buildChallengeWidget(
-            //       widget.challenge, 
-            //       callback: () => (),
-            //       canNavigate: true
-            //     ),
-            //   )
-            // ),
             Hero(
               // key: ValueKey(widget.challenge.id),
               tag: widget.challenge.id,
               child: ChallengeUtils.buildChallengeWidget(
                 widget.challenge, 
                 callback: () => (),
-                canNavigate: false
+                canNavigate: false,
+                builder: (context, methodFromChild) {
+                  myMethod = methodFromChild;
+                },
               )
             ),
-            // SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: ElevatedButton(
                 onPressed: () {
-                  if (LazySingleton.instance.anotherChallengeInProgress(widget.challenge.id)) { return; }
-
-                  switch (widget.challenge.challengeStatus) {
-                    case ChallengeStatus.inactive:
-                      widget.challenge.startChallenge();
-                    case ChallengeStatus.active:
-                      widget.challenge.pauseChallenge();
-                    case ChallengeStatus.completed:
-                      break;
-                      // widget.challenge.continueChallenge();
-                    case ChallengeStatus.ended:
-                      break;
-                      // widget.challenge.continueChallenge();
-                    case ChallengeStatus.paused:
-                       widget.challenge.continueChallenge();
-                  }
-
+                  myMethod.call();
                   setState(() { });
+                    
+                 
+                  
+                  // if (LazySingleton.instance.anotherChallengeInProgress(widget.challenge.id)) { return; }
+
+                  // switch (widget.challenge.challengeStatus) {
+                  //   case ChallengeStatus.inactive:
+                  //     widget.challenge.startChallenge();
+                  //   case ChallengeStatus.active:
+                  //     widget.challenge.pauseChallenge();
+                  //   case ChallengeStatus.completed:
+                  //     break;
+                  //     // widget.challenge.continueChallenge();
+                  //   case ChallengeStatus.ended:
+                  //     break;
+                  //     // widget.challenge.continueChallenge();
+                  //   case ChallengeStatus.paused:
+                  //      widget.challenge.continueChallenge();
+                  // }
+
+                  // setState(() { });
 
                 },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: LazySingleton.instance.isThereActiveChallenge() ? Colors.blueGrey :  const Color(0xFF22577A),
-                    foregroundColor: Colors.white
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: LazySingleton.instance.isThereActiveChallenge() ? Colors.blueGrey :  const Color(0xFF22577A),
+                  foregroundColor: Colors.white
                 ),
-                  child: Text(buttonText()),
+                child: Text(buttonText()),
               )
             ),
             

@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/cam_mode_notifier.dart';
 import 'package:stepit/classes/game.dart';
 import 'package:stepit/classes/user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:stepit/pages/data_loader.dart';
+import 'package:stepit/services/step_tracker_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
   
   WidgetsFlutterBinding.ensureInitialized();
 
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  
   runApp(MultiProvider(
     providers: [
       // ChangeNotifierProvider(create: (context) => StepCounterProvider()),
-      ChangeNotifierProvider(create: (context) => UserProvider()),
-      ChangeNotifierProvider(create: (context) => GameProvider()),
-      ChangeNotifierProvider(create: (context) => CamModeNotifier())
+      ChangeNotifierProvider(create: (_) => StepTrackerServiceNotifier()),
+      ChangeNotifierProvider(create: (_) => UserProvider()),
+      ChangeNotifierProvider(create: (_) => GameProvider()),
+      ChangeNotifierProvider(create: (_) => CamModeNotifier())
     ],
     child: const MyApp(),
   ));

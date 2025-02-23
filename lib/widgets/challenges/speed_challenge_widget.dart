@@ -10,10 +10,10 @@ import 'package:stepit/widgets/challenge_card.dart';
 
 class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
 
-  const SpeedChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback});
+  const SpeedChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
 
   @override
-  Widget buildContent() {
+  Widget buildContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -186,6 +186,11 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
 
     if (!mounted) return;
+  }
+  
+  @override
+  void startChallenge() {
+    // TODO: implement startChallenge
   }
 
 }

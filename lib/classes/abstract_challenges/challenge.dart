@@ -64,7 +64,7 @@ abstract class Challenge {
     return dateFormat.format(endTime!);
   }
 
-  void startChallenge() {
+  void start() {
     startTime = DateTime.now();
     challengeStatus = ChallengeStatus.active;
     // LazySingleton.instance.challengeInProgress = true;
@@ -72,14 +72,14 @@ abstract class Challenge {
     print("$name challenge started! $startTime");
   }
 
-  void continueChallenge() {
+  void resume() {
     challengeStatus = ChallengeStatus.active;
     // LazySingleton.instance.challengeInProgress = true;
     LazySingleton.instance.activeChallenge = this;
     print("$name challenge continued! $startTime");
   }
 
-  void endChallenge() {
+  void end() {
     endTime = DateTime.now();
     challengeStatus = ChallengeStatus.ended;
     // LazySingleton.instance.challengeInProgress = false;
@@ -87,15 +87,15 @@ abstract class Challenge {
     print("$name challenge ended!");
   }
 
-  void pauseChallenge() {
-    endTime = DateTime.now();
+  void pause() {
+    // endTime = DateTime.now();
     challengeStatus = ChallengeStatus.paused;
     // LazySingleton.instance.challengeInProgress = false;
     LazySingleton.instance.activeChallenge = null;
-    print("$name challenge ended!");
+    print("$name challenge paused!");
   }
 
-  void completeChallenge() {
+  void complete() {
     endTime = DateTime.now();
     challengeStatus = ChallengeStatus.completed;
     // LazySingleton.instance.challengeInProgress = false;
@@ -106,8 +106,8 @@ abstract class Challenge {
   void updateFirebase(Map<String, dynamic> jsonData) {
 
     final userId = LazySingleton.instance.currentUser?.uniqueNumber;
-    
-    if (userId == null ) { return; }
+
+    if (userId == null) { return; }
 
     CollectionReference userChallenges = FirebaseFirestore.instance
       .collection("users")

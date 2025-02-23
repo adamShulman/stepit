@@ -52,36 +52,36 @@ class StepsChallenge extends Challenge with ChangeNotifier {
   }
 
   @override
-  void startChallenge() {
-    super.startChallenge();
+  void start() {
+    super.start();
     notifyListeners();
     super.updateFirebase(toJson());
   }
 
   @override
-  void continueChallenge() {
-    super.continueChallenge();
+  void resume() {
+    super.resume();
     notifyListeners();
     super.updateFirebase(toJson());
   }
 
   @override 
-  void pauseChallenge() {
-    super.pauseChallenge();
+  void pause() {
+    super.pause();
     notifyListeners();
     super.updateFirebase(toJson());
   }
   
   @override 
-  void endChallenge() {
-    super.endChallenge();
+  void end() {
+    super.end();
     notifyListeners();
     super.updateFirebase(toJson());
   }
 
   @override 
-  void completeChallenge() {
-    super.completeChallenge();
+  void complete() {
+    super.complete();
     notifyListeners();
     super.updateFirebase(toJson());
   }

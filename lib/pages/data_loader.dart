@@ -36,6 +36,8 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
       //   _firestoreService.fetchChallengesOnce()
       // ]);
 
+      Future.delayed(const Duration(seconds: 1), () async {
+
       final prefs = await SharedPreferences.getInstance();
 
       final isFirstTime = prefs.getBool('first_time') ?? true;
@@ -52,6 +54,10 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
           MaterialPageRoute(builder: (context) => isFirstTime ? const AgreementPage() : const HomePage()),
         );
       }
+
+      });
+
+      
     } catch (e) {
       print("Error during async tasks: $e");
     }

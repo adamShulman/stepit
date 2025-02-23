@@ -1,8 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/challenge_singleton.dart';
 import 'package:stepit/pages/challenge_page.dart';
 import 'package:stepit/utils/utils.dart';
+
+typedef MyBuilder = void Function(BuildContext context, void Function() methodFromChild);
 
 abstract class ChallengeCard<T extends Challenge> extends StatefulWidget {
 
@@ -11,10 +14,12 @@ abstract class ChallengeCard<T extends Challenge> extends StatefulWidget {
   final bool canNavigate;
 
   final void Function()? callback;
+  
+  final MyBuilder? builder;
 
-  const ChallengeCard({super.key, required this.challenge, required this.canNavigate, this.callback});
+  const ChallengeCard({super.key, required this.challenge, required this.canNavigate, this.callback, this.builder});
 
-  Widget buildContent(); 
+  Widget buildContent(BuildContext context); 
 
   @override
   ChallengeCardState createState();
@@ -23,8 +28,54 @@ abstract class ChallengeCard<T extends Challenge> extends StatefulWidget {
 
 abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
 
+  void startChallenge() {
+    widget.challenge.start();
+  }
+
+  void pauseChallenge() {
+    widget.challenge.pause();
+  }
+
+  void resumeChallenge() {
+    widget.challenge.resume();
+  }
+
+  void endChallenge() {
+    widget.challenge.end();
+  }
+
+  void completeChallenge() {
+    widget.challenge.complete();
+  }
+
+  void toggleChallenge() {
+
+    if (LazySingleton.instance.anotherChallengeInProgress(widget.challenge.id)) { return; }
+
+      switch (widget.challenge.challengeStatus) {
+        case ChallengeStatus.inactive:
+          startChallenge();
+        case ChallengeStatus.active:
+          pauseChallenge();
+        case ChallengeStatus.completed:
+          break;
+          // widget.challenge.continueChallenge();
+        case ChallengeStatus.ended:
+          break;
+          // widget.challenge.continueChallenge();
+        case ChallengeStatus.paused:
+            resumeChallenge();
+      }
+
+      // setState(() { });
+
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    widget.builder?.call(context, toggleChallenge);
+
     return GestureDetector(
       onTap: () {
         if (widget.canNavigate) {
@@ -61,12 +112,10 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
               const SizedBox(height: 8),
               Text("Challenge type: ${widget.challenge.challengeType.description}", style: const TextStyle(fontWeight: FontWeight.w500)),
               const SizedBox(height: 8),
-              widget.buildContent(), 
+              widget.buildContent(context),
               const SizedBox(height: 12),
               Text("Status: ${widget.challenge.challengeStatus.description}",
                   style: const TextStyle(color: Colors.black)),
-              // Text("Completed: ${widget.challenge.challengeStatus.description ? "✅" : "❌"}",
-                  // style: TextStyle(color: Colors.black)),
             ],
           ),
         ),

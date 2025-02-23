@@ -7,6 +7,7 @@ import 'package:stepit/classes/abstract_challenges/duration_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/influence_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/speed_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/steps_challenge.dart';
+import 'package:stepit/widgets/challenge_card.dart';
 import 'package:stepit/widgets/challenges/distance_challenge_widget.dart';
 import 'package:stepit/widgets/challenges/duration_challenge_widget.dart';
 import 'package:stepit/widgets/challenges/influence_challenge_widget.dart';
@@ -19,9 +20,9 @@ class ChallengeUtils {
 
   ChallengeUtils._(); 
 
-  static Widget buildChallengeWidget(Challenge challenge, { Key? key, void Function()? callback, bool canNavigate = true }) {
+  static Widget buildChallengeWidget(Challenge challenge, { Key? key, void Function()? callback, bool canNavigate = true, MyBuilder? builder }) {
     return switch (challenge) {
-      StepsChallenge stepsChallenge => StepsChallengeCard(key: key, challenge: stepsChallenge, callback: callback, canNavigate: canNavigate),
+      StepsChallenge stepsChallenge => StepsChallengeCard(key: key, challenge: stepsChallenge, callback: callback, canNavigate: canNavigate, builder: builder),
       SpeedChallenge speedChallenge => SpeedChallengeCard(key: key, challenge: speedChallenge, callback: callback, canNavigate: canNavigate),
       DistanceChallenge distanceChallenge => DistanceChallengeCard(key: key, challenge: distanceChallenge, callback: callback, canNavigate: canNavigate),
       DurationChallenge durationChallenge => DurationChallengeCard(key: key, challenge: durationChallenge, callback: callback, canNavigate: canNavigate),
