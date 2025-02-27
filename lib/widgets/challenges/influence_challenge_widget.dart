@@ -10,7 +10,7 @@ import 'package:stepit/widgets/challenge_card.dart';
 
 class InfluenceChallengeCard extends ChallengeCard<InfluenceChallenge> {
 
-  const InfluenceChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
+  const InfluenceChallengeCard({super.key, required super.challenge, super.onChallengeTap, super.builder});
 
   @override
   Widget buildContent(BuildContext context) {

@@ -74,10 +74,9 @@ class UserProvider with ChangeNotifier {
   }
 }
 
-void saveUser(String username, int uniqueNumber, String gameType, int level) async {
-  User user = User(username: username, uniqueNumber: uniqueNumber, gameType: gameType, level: level);
+Future<void> saveUser(String username, int uniqueNumber, String gameType, int level) async {
 
-  LazySingleton.instance.currentUser = user;
+  User user = User(username: username, uniqueNumber: uniqueNumber, gameType: gameType, level: level);
 
   // Save to Firebase
   await FirebaseFirestore.instance.collection('users').doc(uniqueNumber.toString().padLeft(6, '0')).set(user.toMap());
@@ -88,6 +87,8 @@ void saveUser(String username, int uniqueNumber, String gameType, int level) asy
   await prefs.setInt('uniqueNumber', user.uniqueNumber);
   await prefs.setString('gameType', user.gameType);
   await prefs.setInt('level', user.level);
+
+  LazySingleton.instance.currentUser = user;
 
   // Update user provider
   // Provider.of<UserProvider>(context, listen: false).setUser(user);

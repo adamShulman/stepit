@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:stepit/classes/database.dart';
 import 'package:stepit/pages/homepage.dart';
 import 'package:stepit/classes/user.dart';
+import 'package:stepit/utils/utils.dart';
+import 'package:stepit/widgets/app_bar.dart';
+import 'package:stepit/widgets/background_gradient_container.dart';
 
 class IdentificationPage extends StatefulWidget {
 
@@ -14,17 +17,17 @@ class IdentificationPage extends StatefulWidget {
 }
 
 class _IdentificationPageState extends State<IdentificationPage> {
-  String _username = '';
-  late Future<int> _uniqueNumber;
+
+  String? _username;
+  int? _uniqueNumber;
   late String _gameType;
-  bool connectionState = false;
+
+  final TextEditingController _usernameTextFieldController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _uniqueNumber = _generateUniqueNumber();
     _gameType = _generateGameType();
-    //_gameType = 'Influence';
   }
 
   Future<int> _generateUniqueNumber() async {
@@ -39,39 +42,41 @@ class _IdentificationPageState extends State<IdentificationPage> {
     }
     return 'Influence';
   }
-  
-  // Future<int> _generateUniqueNumber() async {
-    //     Random().nextInt(
-    //         900000); // Generates a random number between 100000 and 999999
-    // bool isUnique = await _checkUniqueNumber(uniqueNumber);
-    // while (!isUnique) {
-    //   uniqueNumber = 100000 + Random().nextInt(900000);
-    //   isUnique = await _checkUniqueNumber(uniqueNumber);
-    // }
-    // return uniqueNumber;
-  // }
 
-  // Future<bool> _checkUniqueNumber(int uniqueNumber) async {
-  //   return DataBase.userExists(uniqueNumber);
-  // }
-
-  void _saveToFirestore() async {
-    int uniqueNumber = await _uniqueNumber;
-    String gameType =  _gameType;
-    saveUser(_username, uniqueNumber, gameType, 1);
+  void _showDialogMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Identification'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            style: const ButtonStyle(
+              elevation: WidgetStatePropertyAll(4.0),
+              backgroundColor: WidgetStatePropertyAll(Color(0xFFC7F9CC))
+            ),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.black
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _saveAndNavigateHome() async {
 
-    if (connectionState == false) { return; }
-
     try {
 
-      _saveToFirestore();
-      // startStepsTracking();
-      //loadUser(context).then((_) => startStepsTracking());
+      bool isSaved = await _saveToFirestore();
 
-      if (mounted) {
+      if (mounted && isSaved) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
@@ -82,77 +87,124 @@ class _IdentificationPageState extends State<IdentificationPage> {
     }
   }
 
+  Future<bool> _saveToFirestore() async {
+
+    if (_uniqueNumber == null) {
+      _showDialogMessage('There was an error getting unique number.');
+      return false;
+    }
+
+    final String? userNameValidationMessage = validateUsername(_usernameTextFieldController.text);
+
+    if (userNameValidationMessage != null) {
+      _showDialogMessage(userNameValidationMessage);
+      return false;
+    }
+
+    await saveUser(_usernameTextFieldController.text, _uniqueNumber!, _gameType, 1);
+    return true;
+  }
+
+  String? validateUsername(String? value) {
+
+    const patternMessage = 'Username must contain only letters and numbers, and it must be between 4 and 16 characters long';
+
+    if (value == null || value.isEmpty) {
+      return patternMessage;
+    }
+
+    final emailRegex = RegExp(
+      r'^[0-9A-Za-z]{4,16}$',
+      caseSensitive: false,
+    );
+
+    return emailRegex.hasMatch(value) ? null : patternMessage;
+  }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: const Text('Welcome to StepIT!'),
+      resizeToAvoidBottomInset : false,
+      appBar: const StepItAppBar(
+        title: 'Welcome to StepIT',
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                const SizedBox(height: 50),
-                const Text(
-                  'Enter a username to get started',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        _username = value;
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Enter username',
+      body: BackgroundGradientContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 4,
+              margin: const EdgeInsetsDirectional.symmetric(vertical: 0.0, horizontal: 6.0),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Enter a username to get started',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 17,
+                      ),
                     ),
-                  ),
-                ),
-                FutureBuilder<int>(
-                  future: _uniqueNumber,
-                  builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return  const Center(
-                        child: SizedBox(
-                          width: 50.0,
-                          height: 50.0,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
+                    Image.asset(
+                      "assets/images/stepit_logo_foreground.png",
+                      height: 50.0,
+                      width: 50.0,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: TextFormField(
+                        keyboardType: TextInputType.name,
+                        autofillHints: const [AutofillHints.username],
+                        
+                        controller: _usernameTextFieldController,
+                        style: const TextStyle(
+                          color: Colors.black,
                         ),
-                      );
-                    } else {
-                      connectionState = true;
-                      return Text('Unique number: ${snapshot.data.toString().padLeft(6, '0')}');
-                    }
-                  },
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () => _saveAndNavigateHome(),
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(
-                      color: Color.fromARGB(
-                          255, 0, 0, 0), // Set the desired text color here
+                        decoration: GeneralUtils.formStandardDecoration('username'),
+                      ),
                     ),
+                    FutureBuilder<int>(
+                      future: _generateUniqueNumber(),
+                      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Text('Unique number: loading...');
+                        } else {
+                          if (snapshot.data != null) {
+                            final userIdentifier = snapshot.data!;
+                            _uniqueNumber = userIdentifier;
+                            return Text('Unique number: ${userIdentifier.toString().padLeft(6, '0')}');
+                          } else {
+                            return const Text('Unique number: not found');
+                          }
+                          
+                        }
+                      },
+                    ),
+                  ],
+                )
+              )
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: ElevatedButton(
+                onPressed: () => _saveAndNavigateHome(),
+                child: const Text(
+                  'Done',
+                  style: TextStyle(
+                    color: Colors.black
                   ),
                 ),
-              ],
-            ),
+              ),
+            )
+          ],
           ),
         ),
-      ),
+      )
     );
   }
 }

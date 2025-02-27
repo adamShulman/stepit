@@ -8,7 +8,7 @@ import 'package:stepit/widgets/challenge_card.dart';
 
 class DistanceChallengeCard extends ChallengeCard<DistanceChallenge> {
 
-  const DistanceChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
+  const DistanceChallengeCard({super.key, required super.challenge, super.onChallengeTap, super.builder});
 
   @override
   Widget buildContent(BuildContext context) {

@@ -8,7 +8,7 @@ import 'package:stepit/widgets/challenge_card.dart';
 
 class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
   
-  const StepsChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
+  const StepsChallengeCard({super.key, required super.challenge, super.onChallengeTap, super.builder});
 
   @override
   Widget buildContent(BuildContext context) {
@@ -34,8 +34,8 @@ class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
 
 class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
-  int _stepCount = 0;
-  bool _isTracking = false;
+  // int _stepCount = 0;
+  // bool _isTracking = false;
 
   // @override
   // Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
   void pauseChallenge() {
     super.pauseChallenge();
 
-    _isTracking = false;
+    // _isTracking = false;
     context.read<StepTrackerServiceNotifier>().pauseTracking();
   }
   
@@ -73,7 +73,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
   void startChallenge() {
     super.startChallenge();
 
-    _isTracking = true;
+    // _isTracking = true;
     context.read<StepTrackerServiceNotifier>().startTracking();
   }
 
@@ -81,7 +81,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
   void resumeChallenge() {
     super.resumeChallenge();
 
-    _isTracking = true;
+    // _isTracking = true;
     context.read<StepTrackerServiceNotifier>().resumeTracking();
     
   }
@@ -90,7 +90,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
   void endChallenge() {
     super.endChallenge();
 
-    _isTracking = false;
+    // _isTracking = false;
     context.read<StepTrackerServiceNotifier>().endTracking();
   }
 
@@ -98,7 +98,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
   void completeChallenge() {
     super.completeChallenge();
 
-    _isTracking = false;
+    // _isTracking = false;
     context.read<StepTrackerServiceNotifier>().completeTracking();
 
     String message;

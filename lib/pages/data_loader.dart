@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
 import 'package:stepit/classes/user.dart';
+import 'package:stepit/pages/identification.dart';
 import 'package:stepit/pages/agreement.dart';
 import 'package:stepit/pages/homepage.dart';
 import 'package:stepit/services/firebase_service.dart';
@@ -31,11 +32,6 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
   Future<void> _performAsyncTasks() async {
     try {
 
-      // final [prefs as SharedPreferences, challenges as List<Challenge>] = await Future.wait([
-      //   SharedPreferences.getInstance(),
-      //   _firestoreService.fetchChallengesOnce()
-      // ]);
-
       Future.delayed(const Duration(seconds: 1), () async {
 
       final prefs = await SharedPreferences.getInstance();
@@ -43,15 +39,24 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
       final isFirstTime = prefs.getBool('first_time') ?? true;
       final uniqueNumber = prefs.getInt('uniqueNumber');
 
+      Widget? destination;
+
       if ( uniqueNumber != null ) {
         final User currentUser = await _firestoreService.getUser(uniqueNumber);
         LazySingleton.instance.currentUser = currentUser;
+        destination = const HomePage();
         print(currentUser.username);
+      } else {
+        if (isFirstTime) {
+          destination = const AgreementPage();
+        } else {
+          destination = const IdentificationPage();
+        }
       }
 
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => isFirstTime ? const AgreementPage() : const HomePage()),
+          MaterialPageRoute(builder: (context) => destination!),
         );
       }
 
@@ -66,7 +71,7 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,     
+      // backgroundColor: Colors.transparent,     
       body: BackgroundGradientContainer(
         child: Center(
           child: Column(

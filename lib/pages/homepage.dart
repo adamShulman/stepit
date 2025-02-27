@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/pages/challenge_page.dart';
 import 'package:stepit/services/firebase_service.dart';
 import 'package:stepit/utils/utils.dart';
+import 'package:stepit/widgets/app_bar.dart';
 import 'package:stepit/widgets/background_gradient_container.dart';
 import 'package:stepit/widgets/daily_step_counter.dart';
 
@@ -19,7 +21,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   final FirestoreService _firestoreService = FirestoreService();
 
-  late final List<Challenge> _challenges;
+  // late List<Challenge>? _challenges;
 
   @override
   void initState() {
@@ -58,41 +60,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  void _goToChallengeDetails(Challenge challenge) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChallengePages(challenge: challenge)
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       // extendBody: true,
-      appBar: AppBar(
-        // backgroundColor: Colors.transparent,
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'Choose a challenge',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 25.0,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                offset: Offset(1.0, -1.0),
-                blurRadius: 1.0,
-                color: Colors.white
-              ),
-            ],
-          )
-        ),
+      appBar: const StepItAppBar(
+        title: 'Choose a challenge',
       ),
       body: BackgroundGradientContainer(
         child: SingleChildScrollView(
           child: Column(
-
             children: [
               const DailyStepCounter(),
               FutureBuilder(
                 future: _firestoreService.fetchChallengesOnce(),
                 builder: (context, snapshot) {
-
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: Padding(
@@ -106,7 +98,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     final challenges = snapshot.data!;
-                    _challenges = challenges;
+                    // _challenges = challenges;
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -117,7 +109,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           tag: challenge.id,
                           child: ChallengeUtils.buildChallengeWidget(
                             challenge,
-                            canNavigate: true
+                            onTap: () => _goToChallengeDetails(challenge),
                           ),
                         );
                       },
@@ -133,13 +125,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ),
       )
-      
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     // await _firestoreService.addUser("New User", "newuser@example.com");
-      //   },
-      //   child: const Icon(Icons.add),
-      // ),
     );
   }
 }

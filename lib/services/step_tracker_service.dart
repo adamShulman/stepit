@@ -140,12 +140,16 @@ class StepTrackerServiceNotifier with ChangeNotifier {
   StepTrackerServiceNotifier._internal();
 
   StreamSubscription<StepCount>? _subscription;
+  StreamSubscription<PedestrianStatus>? _pedestrianStatusSubscription;
+
   int _initialSteps = 0;
   int _currentSteps = 0;
   bool _isTracking = false;
+  ChallengePedestrianStatus _pedestrianStatus = ChallengePedestrianStatus.unknown;
 
   int get currentSteps => _currentSteps;
   bool get isTracking => _isTracking;
+  ChallengePedestrianStatus get challengePedestrianStatus => _pedestrianStatus;
 
   Future<bool> _checkPermission() async {
     final status = await Permission.activityRecognition.status;
@@ -168,12 +172,33 @@ class StepTrackerServiceNotifier with ChangeNotifier {
       (StepCount event) {
         if (_initialSteps == 0) _initialSteps = event.steps;
         _currentSteps = event.steps - _initialSteps;
-        notifyListeners(); // 🔥 UI updates automatically
+        notifyListeners(); 
       },
       onError: (error) => notifyListeners(),
       cancelOnError: true,
     );
     notifyListeners();
+  }
+
+  Future<void> startPedestrianStateTracking() async {
+
+    if (_pedestrianStatusSubscription != null) { return; }
+    
+    _pedestrianStatusSubscription = Pedometer.pedestrianStatusStream.listen(
+      (PedestrianStatus event) {
+        _pedestrianStatus = ChallengePedestrianStatus.fromString(event.status);
+        notifyListeners(); 
+      }
+    );
+    notifyListeners();
+  }
+
+  void pausePedestrianStatusTracking() {
+    _pedestrianStatusSubscription?.pause();
+  }
+
+  void resumePedestrianStatusTracking() {
+    _pedestrianStatusSubscription?.resume();
   }
 
   bool isPaused() {
@@ -206,5 +231,26 @@ class StepTrackerServiceNotifier with ChangeNotifier {
     _currentSteps = 0;
     _isTracking = false;
     notifyListeners();
+  }
+}
+
+enum ChallengePedestrianStatus {
+  walking,
+  stopped,
+  unknown;
+
+  factory ChallengePedestrianStatus.fromString(String description) { return ChallengePedestrianStatus.values.firstWhere((x) => x.description == description); }
+}
+
+extension ChallengeStatusExtension on ChallengePedestrianStatus {
+  String get description {
+    switch (this) {
+      case ChallengePedestrianStatus.walking:
+        return "walking";
+      case ChallengePedestrianStatus.stopped:
+        return "stopped";
+      case ChallengePedestrianStatus.unknown:
+        return "unknown";
+    }
   }
 }

@@ -1,13 +1,19 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:pedometer/pedometer.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/services/step_tracker_service.dart';
 
 class SpeedChallenge extends Challenge with ChangeNotifier {
   
   final int? targetSpeed;
   final int targetTime;
+
   int progress = 0;
+  int elapsedSeconds = 0;
+
+  ChallengePedestrianStatus challengePedestrianStatus = ChallengePedestrianStatus.unknown;
 
   SpeedChallenge({
     required super.id,
@@ -91,5 +97,10 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
   @override
   bool isCompleted() {
     return progress >= 100;
+  }
+
+  void setPedestrianStatus(ChallengePedestrianStatus pedestrianStatus) {
+    challengePedestrianStatus = pedestrianStatus;
+    notifyListeners();
   }
 }

@@ -16,17 +16,15 @@ import 'package:stepit/widgets/challenges/steps_challenge_widget.dart';
 
 class ChallengeUtils {
 
-  static final widKey = GlobalKey();
-
   ChallengeUtils._(); 
 
-  static Widget buildChallengeWidget(Challenge challenge, { Key? key, void Function()? callback, bool canNavigate = true, MyBuilder? builder }) {
+  static Widget buildChallengeWidget(Challenge challenge, { Key? key, VoidCallback? onTap, ChildCallbackBuilder? builder }) {
     return switch (challenge) {
-      StepsChallenge stepsChallenge => StepsChallengeCard(key: key, challenge: stepsChallenge, callback: callback, canNavigate: canNavigate, builder: builder),
-      SpeedChallenge speedChallenge => SpeedChallengeCard(key: key, challenge: speedChallenge, callback: callback, canNavigate: canNavigate),
-      DistanceChallenge distanceChallenge => DistanceChallengeCard(key: key, challenge: distanceChallenge, callback: callback, canNavigate: canNavigate),
-      DurationChallenge durationChallenge => DurationChallengeCard(key: key, challenge: durationChallenge, callback: callback, canNavigate: canNavigate),
-      InfluenceChallenge influenceChallenge => InfluenceChallengeCard(key: key, challenge: influenceChallenge, callback: callback, canNavigate: canNavigate),
+      StepsChallenge stepsChallenge => StepsChallengeCard(key: key, challenge: stepsChallenge, onChallengeTap: onTap, builder: builder),
+      SpeedChallenge speedChallenge => SpeedChallengeCard(key: key, challenge: speedChallenge, onChallengeTap: onTap, builder: builder),
+      DistanceChallenge distanceChallenge => DistanceChallengeCard(key: key, challenge: distanceChallenge, onChallengeTap: onTap, builder: builder),
+      DurationChallenge durationChallenge => DurationChallengeCard(key: key, challenge: durationChallenge, onChallengeTap: onTap, builder: builder),
+      InfluenceChallenge influenceChallenge => InfluenceChallengeCard(key: key, challenge: influenceChallenge, onChallengeTap: onTap, builder: builder),
       _ => const SizedBox.shrink(), 
     };
   }
@@ -89,4 +87,56 @@ class ChallengeUtils {
     return icon;
  }
  
+}
+
+class GeneralUtils {
+
+  GeneralUtils._();
+
+  static InputDecoration formStandardDecoration(String labelText) => InputDecoration(
+    labelStyle: const TextStyle(color: Colors.black),
+    labelText: labelText,
+    fillColor: Colors.black,
+    contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12),
+    errorStyle: const TextStyle(
+      color: Colors.black,
+      fontSize: 13,
+      fontWeight: FontWeight.normal,
+    ),
+    border: const OutlineInputBorder(
+      borderSide: BorderSide(
+        color: Color(0xFF22577A),
+      ),
+      borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      ),
+    ),
+    focusedBorder: const OutlineInputBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      ),
+      borderSide: BorderSide(
+        width: 1,
+        color: Color(0xFF22577A),
+      ),
+    ),
+    enabledBorder: const OutlineInputBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      ),
+      borderSide: BorderSide(
+        color: Color(0xFF22577A),
+        width: 1,
+      ),
+    ),
+    errorBorder: const OutlineInputBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      ),
+      borderSide: BorderSide(
+        color: Color(0xFF22577A),
+        width: 1,
+      ),
+    ),
+    );
 }

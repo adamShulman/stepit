@@ -7,6 +7,7 @@ import 'package:stepit/classes/user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:stepit/pages/data_loader.dart';
 import 'package:stepit/services/step_tracker_service.dart';
+import 'package:stepit/services/timer_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -23,6 +24,7 @@ void main() async {
     providers: [
       // ChangeNotifierProvider(create: (context) => StepCounterProvider()),
       ChangeNotifierProvider(create: (_) => StepTrackerServiceNotifier()),
+      // ChangeNotifierProvider(create: (_) => TimerService()),
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => GameProvider()),
       ChangeNotifierProvider(create: (_) => CamModeNotifier())

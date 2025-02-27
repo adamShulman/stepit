@@ -2,22 +2,19 @@
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
-import 'package:stepit/pages/challenge_page.dart';
 import 'package:stepit/utils/utils.dart';
 
-typedef MyBuilder = void Function(BuildContext context, void Function() methodFromChild);
+typedef ChildCallbackBuilder = void Function(BuildContext context, void Function() methodFromChild);
 
 abstract class ChallengeCard<T extends Challenge> extends StatefulWidget {
 
   final T challenge;
 
-  final bool canNavigate;
-
-  final void Function()? callback;
+  final VoidCallback? onChallengeTap;
   
-  final MyBuilder? builder;
+  final ChildCallbackBuilder? builder;
 
-  const ChallengeCard({super.key, required this.challenge, required this.canNavigate, this.callback, this.builder});
+  const ChallengeCard({super.key, required this.challenge, this.onChallengeTap, this.builder});
 
   Widget buildContent(BuildContext context); 
 
@@ -59,16 +56,12 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
           pauseChallenge();
         case ChallengeStatus.completed:
           break;
-          // widget.challenge.continueChallenge();
         case ChallengeStatus.ended:
           break;
-          // widget.challenge.continueChallenge();
         case ChallengeStatus.paused:
-            resumeChallenge();
+          resumeChallenge();
+
       }
-
-      // setState(() { });
-
   }
 
   @override
@@ -78,14 +71,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
 
     return GestureDetector(
       onTap: () {
-        if (widget.canNavigate) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChallengePages(challenge: widget.challenge)
-            ),
-          );
-        }
+        widget.onChallengeTap != null ? widget.onChallengeTap!() : ();
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -99,7 +85,15 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(widget.challenge.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Flexible(
+                    child: Text(
+                      widget.challenge.name, 
+                      style: const TextStyle(
+                        fontSize: 17.0, 
+                        fontWeight: FontWeight.bold
+                      )
+                    ),
+                  ),
                   Image.asset(
                     ChallengeUtils.imageNameFor(widget.challenge), 
                     width: 30, 
@@ -107,15 +101,32 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(widget.challenge.description, style: const TextStyle(fontSize: 16, color: Colors.grey)),
-              const SizedBox(height: 8),
-              Text("Challenge type: ${widget.challenge.challengeType.description}", style: const TextStyle(fontWeight: FontWeight.w500)),
-              const SizedBox(height: 8),
+              const SizedBox(height: 8.0),
+              Text(
+                widget.challenge.description, 
+                style: const TextStyle(
+                  fontSize: 14.0, 
+                  color: Colors.grey
+                )
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                "Challenge type: ${widget.challenge.challengeType.description}", 
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w500
+                )
+              ),
+              const SizedBox(height: 8.0),
               widget.buildContent(context),
-              const SizedBox(height: 12),
-              Text("Status: ${widget.challenge.challengeStatus.description}",
-                  style: const TextStyle(color: Colors.black)),
+              const SizedBox(height: 12.0),
+              Text(
+                "Status: ${widget.challenge.challengeStatus.description}",
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.black
+                )
+              ),
             ],
           ),
         ),

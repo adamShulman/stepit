@@ -17,7 +17,10 @@ class HealthService {
 
   int _currentSteps = 0;
 
+  HealthConnectSdkStatus? _status;
+
   int get currentSteps => _currentSteps;
+  HealthConnectSdkStatus? get healthConnectStatus => _status;
 
   Future<void> installHealthConnect() async => await health.installHealthConnect();
 
@@ -29,9 +32,19 @@ class HealthService {
     final now = DateTime.now();
     final midnight = DateTime(now.year, now.month, now.day);
 
-    await getHealthConnectSdkStatus();
+    final healthConnectStatus = await getHealthConnectSdkStatus();
 
-    health.installHealthConnect();
+    _status = healthConnectStatus;
+
+    switch (healthConnectStatus!) {
+
+      case HealthConnectSdkStatus.sdkUnavailable:
+        return 0;
+      case HealthConnectSdkStatus.sdkUnavailableProviderUpdateRequired:
+        installHealthConnect();
+      case HealthConnectSdkStatus.sdkAvailable:
+        break;
+    }
 
     bool stepsPermission =
         await health.hasPermissions([HealthDataType.STEPS]) ?? false;
@@ -58,12 +71,13 @@ class HealthService {
     return steps ?? 0;
   }
 
-  Future<void> getHealthConnectSdkStatus() async {
+  Future<HealthConnectSdkStatus?> getHealthConnectSdkStatus() async {
     assert(Platform.isAndroid, "This is only available on Android");
 
     final status = await health.getHealthConnectSdkStatus();
-
     print(status);
+
+    return status;
   }
 
   Future<bool> revokeAccess() async {

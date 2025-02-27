@@ -1,26 +1,58 @@
 
 
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:pedometer/pedometer.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/speed_challenge.dart';
+import 'package:stepit/services/step_tracker_service.dart';
+import 'package:stepit/services/timer_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
+import 'package:stepit/widgets/timer_counter.dart';
 
 class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
 
-  const SpeedChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
+  const SpeedChallengeCard({super.key, required super.challenge, super.onChallengeTap, super.builder});
 
   @override
   Widget buildContent(BuildContext context) {
+
+    final stepService = context.watch<StepTrackerServiceNotifier>();
+    // final timerService = context.watch<TimerService>();
+
+    challenge.challengePedestrianStatus = stepService.challengePedestrianStatus;
+    // challenge.elapsedSeconds = timerService.elapsedSeconds;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Target: ${challenge.targetTime} min"),
-        Text("Progress: ${challenge.progress ?? 0} min"),
+        Text("Progress: ${challenge.progress} min"),
+        challenge.challengeStatus == ChallengeStatus.active 
+        ? Text("Pedestrian status: ${challenge.challengePedestrianStatus.description}") 
+        : const SizedBox.shrink(),
+        Text("time in seconds: ${challenge.elapsedSeconds}"),
+        // const TimerCounterWidget(),
       ],
     );
+      
+
+    // return ChangeNotifierProvider(
+    //   create: (_) => TimerService(),
+    //   builder: (context, child) {
+    //     return Column(
+    //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       children: [
+    //         Text("Target: ${challenge.targetTime} min"),
+    //         Text("Progress: ${challenge.progress} min"),
+    //         Text("Pedestrian status: ${challenge.challengePedestrianStatus.description}"),
+    //         Text("time in seconds: ${context.read<TimerService>().elapsedSeconds}"),
+    //         // const TimerCounterWidget(),
+    //       ],
+    //     );
+    //   },
+    // );
   }
 
   @override
@@ -29,80 +61,149 @@ class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
 
 class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
 
-  int _stepCount = 0;
-  
-  late Stream<StepCount> _stepCountStream;
-  late Stream<PedestrianStatus> _pedestrianStatusStream;
-  String _status = '?', _steps = '?';
-  bool isActive = false;
-  
+  late TimerService _timerService;
+  int _elapsedSeconds = 0;
+
   late StreamSubscription _periodicSub;
 
   @override
   void initState() {
+    super.initState();
 
-    _periodicSub = Stream.periodic(const Duration(milliseconds: 1000)).listen((_) {
+    _timerService = TimerService(onTimerUpdate: onTimerUpdate);
 
-      switch (widget.challenge.challengeStatus) {
-        case ChallengeStatus.inactive:
-          isActive = false;
-          
-        case ChallengeStatus.active:
-          if (isActive) {
+    _periodicSub = Stream.periodic(const Duration(seconds: 2)).listen((_) {
 
-          } else {
-            isActive = true;
-            _startChallenge();
+      switch (widget.challenge.challengePedestrianStatus) {
+
+        case ChallengePedestrianStatus.walking:
+          if (_timerService.isRunning == false) {
+            Future.delayed(const Duration(milliseconds: 100), () {
+              _timerService.resumeTimer();
+            });
+            
+          }
+        case ChallengePedestrianStatus.stopped:
+         if (_timerService.isRunning) {
+            Future.delayed(const Duration(milliseconds: 100), () {
+              _timerService.pauseTimer();
+            });
+            
           }
           
-        case ChallengeStatus.completed:
-          if (isActive) {
-            isActive = false;
-            _completeChallenge();
+        case ChallengePedestrianStatus.unknown:
+          if (_timerService.isRunning) {
+            Future.delayed(const Duration(milliseconds: 100), () {
+              _timerService.pauseTimer();
+            });
+            
           }
-         
-        case ChallengeStatus.ended:
-        if (isActive) {
-            isActive = false;
-            _endChallenge();
-          }
-
-          case ChallengeStatus.paused:
-          if (isActive) {
-            isActive = false;
-            _pauseChallenge();
-          }
-         
       }
      
     });
-
     
+  }
 
+  void onTimerUpdate(int elapsedTime) {
+
+    if (widget.challenge.challengePedestrianStatus == ChallengePedestrianStatus.walking) {
+      _elapsedSeconds = elapsedTime;
+      widget.challenge.elapsedSeconds = elapsedTime;
     
-    super.initState();
+      // if (_timerService.isRunning == false) {
+      //   Future.delayed(const Duration(milliseconds: 100), () {
+      //     _timerService.resumeTimer();
+      //   });
+        
+      // }
+      print("ChallengePedestrianStatus.walking");
+    } else if (widget.challenge.challengePedestrianStatus == ChallengePedestrianStatus.stopped) {
 
+      // if (_timerService.isRunning) {
+      //   Future.delayed(const Duration(milliseconds: 100), () {
+      //     _timerService.pauseTimer();
+      //   });
+      // }
+      
+      print("ChallengePedestrianStatus.stopped");
+    } else {
+      //  _timerService.pauseTimer();
+        print("ChallengePedestrianStatus.unknown");
+    }
+
+    setState(() { });
+      
   }
 
   @override
   void dispose() {
+    _timerService.stopTimer();
     _periodicSub.cancel();
     super.dispose();
+
   }
 
+  void _startTimer() {
 
-  void _pauseChallenge() {
-    // _timer?.cancel();
   }
 
-  void _startChallenge() {
-    initPlatformState();
+  // @override
+  // Widget build(BuildContext context) {
+
+  //   return ChangeNotifierProvider(
+  //     create: (_) => TimerService(),
+  //     builder: (context, child) {
+  //       return super.build(context);
+  //     }
+  //   );    
+  // }
+
+  @override
+  void pauseChallenge() {
+    super.pauseChallenge();
+    // _stopwatch.stop();
+    // Duration durt = Duration(milliseconds: _stopwatch.elapsedMilliseconds);
+    // durt.inSeconds
+    //  context.read<TimerService>().pauseTimer();
+    _timerService.pauseTimer();
+    context.read<StepTrackerServiceNotifier>().pausePedestrianStatusTracking();
+  }
+  
+  @override
+  void startChallenge() {
+    super.startChallenge();
+    // _stopwatch.start();
+    _timerService.startTimer();
+    //  Provider.of<TimerService>(context, listen: false).startTimer();
+    context.read<StepTrackerServiceNotifier>().startPedestrianStateTracking();
   }
 
-  void _completeChallenge() {
+  @override
+  void resumeChallenge() {
+    super.resumeChallenge();
+    // _stopwatch.start();
+    // context.read<TimerService>().resumeTimer();
+    _timerService.resumeTimer();
+    context.read<StepTrackerServiceNotifier>().resumePedestrianStatusTracking();
+    
+  }
 
-    // widget.challenge.challengeStatus = ChallengeStatus.completed;
-    // widget.challenge.endTime = DateTime.now();
+  @override
+  void endChallenge() {
+    super.endChallenge();
+
+    _timerService.stopTimer();
+    // context.read<TimerService>().stopTimer();
+    // context.read<StepTrackerServiceNotifier>().endTracking();
+  }
+
+  @override
+  void completeChallenge() {
+    super.completeChallenge();
+
+    _timerService.stopTimer();
+    // context.read<TimerService>().stopTimer();
+    // context.read<StepTrackerServiceNotifier>().completeTracking();
 
     String message;
     message = 'Congratulations! You have completed the challenge.';
@@ -123,74 +224,4 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
       ),
     );
   }
-
-  void _endChallenge() {
-
-  
-
-  }
-
-  
-
-   void onStepCount(StepCount event) {
-    print(event);
-    setState(() {
-      _steps = event.steps.toString();
-    });
-  }
-
-  void onPedestrianStatusChanged(PedestrianStatus event) {
-    print(event);
-    setState(() {
-      _status = event.status;
-    });
-  }
-
-  void onPedestrianStatusError(error) {
-    print('onPedestrianStatusError: $error');
-    setState(() {
-      _status = 'Pedestrian Status not available';
-    });
-    print(_status);
-  }
-
-  void onStepCountError(error) {
-    print('onStepCountError: $error');
-    setState(() {
-      _steps = 'Step Count not available';
-    });
-  }
-
-  Future<bool> _checkActivityRecognitionPermission() async {
-    bool granted = await Permission.activityRecognition.isGranted;
-
-    if (!granted) {
-      granted = await Permission.activityRecognition.request() ==
-          PermissionStatus.granted;
-    }
-
-    return granted;
-  }
-
-  Future<void> initPlatformState() async {
-    bool granted = await _checkActivityRecognitionPermission();
-    if (!granted) {
-      // tell user, the app will not work
-    }
-
-    _pedestrianStatusStream = Pedometer.pedestrianStatusStream;
-    (_pedestrianStatusStream.listen(onPedestrianStatusChanged))
-        .onError(onPedestrianStatusError);
-
-    _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream.listen(onStepCount).onError(onStepCountError);
-
-    if (!mounted) return;
-  }
-  
-  @override
-  void startChallenge() {
-    // TODO: implement startChallenge
-  }
-
 }

@@ -12,15 +12,16 @@ import 'package:stepit/widgets/challenge_card.dart';
 
 class DurationChallengeCard extends ChallengeCard<DurationChallenge> {
 
-  const DurationChallengeCard({super.key, required super.challenge, required super.canNavigate, super.callback, super.builder});
+  const DurationChallengeCard({super.key, required super.challenge, super.onChallengeTap, super.builder});
 
   @override
   Widget buildContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Target: ${challenge.targetSteps} steps"),
-        Text("Progress: ${challenge.progress} steps"),
+        Text("Target steps: ${challenge.targetSteps}"),
+        Text("Target duration: ${challenge.targetDuration} minutes"),
+        // Text("Progress: ${challenge.progress} steps"),
       ],
     );
   }
