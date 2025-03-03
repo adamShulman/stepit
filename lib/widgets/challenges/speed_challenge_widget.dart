@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/speed_challenge.dart';
+import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/services/timer_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
@@ -19,10 +20,8 @@ class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
   Widget buildContent(BuildContext context) {
 
     final stepService = context.watch<StepTrackerServiceNotifier>();
-    // final timerService = context.watch<TimerService>();
 
     challenge.challengePedestrianStatus = stepService.challengePedestrianStatus;
-    // challenge.elapsedSeconds = timerService.elapsedSeconds;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,52 +139,41 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
     _timerService.stopTimer();
     _periodicSub.cancel();
     super.dispose();
-
   }
-
-  void _startTimer() {
-
-  }
-
-  // @override
-  // Widget build(BuildContext context) {
-
-  //   return ChangeNotifierProvider(
-  //     create: (_) => TimerService(),
-  //     builder: (context, child) {
-  //       return super.build(context);
-  //     }
-  //   );    
-  // }
 
   @override
   void pauseChallenge() {
     super.pauseChallenge();
-    // _stopwatch.stop();
-    // Duration durt = Duration(milliseconds: _stopwatch.elapsedMilliseconds);
-    // durt.inSeconds
-    //  context.read<TimerService>().pauseTimer();
+
     _timerService.pauseTimer();
+
     context.read<StepTrackerServiceNotifier>().pausePedestrianStatusTracking();
+
+    context.read<LocationService>().stopTracking();
   }
   
   @override
   void startChallenge() {
     super.startChallenge();
-    // _stopwatch.start();
+
     _timerService.startTimer();
-    //  Provider.of<TimerService>(context, listen: false).startTimer();
+
     context.read<StepTrackerServiceNotifier>().startPedestrianStateTracking();
+
+    final locationService = context.read<LocationService>();
+    locationService.currentChallenge = widget.challenge;
+    locationService.startTracking();
+
   }
 
   @override
   void resumeChallenge() {
     super.resumeChallenge();
-    // _stopwatch.start();
-    // context.read<TimerService>().resumeTimer();
+
     _timerService.resumeTimer();
+
     context.read<StepTrackerServiceNotifier>().resumePedestrianStatusTracking();
-    
+    context.read<LocationService>().startTracking();
   }
 
   @override
@@ -193,8 +181,7 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
     super.endChallenge();
 
     _timerService.stopTimer();
-    // context.read<TimerService>().stopTimer();
-    // context.read<StepTrackerServiceNotifier>().endTracking();
+    context.read<LocationService>().stopTracking();
   }
 
   @override
@@ -202,9 +189,9 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
     super.completeChallenge();
 
     _timerService.stopTimer();
-    // context.read<TimerService>().stopTimer();
-    // context.read<StepTrackerServiceNotifier>().completeTracking();
 
+    context.read<LocationService>().stopTracking();
+    
     String message;
     message = 'Congratulations! You have completed the challenge.';
 

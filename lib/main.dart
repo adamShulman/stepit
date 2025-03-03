@@ -6,6 +6,7 @@ import 'package:stepit/classes/game.dart';
 import 'package:stepit/classes/user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:stepit/pages/data_loader.dart';
+import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/services/timer_service.dart';
 import 'firebase_options.dart';
@@ -22,6 +23,7 @@ void main() async {
 
   runApp(MultiProvider(
     providers: [
+      ChangeNotifierProvider(create: (_) => LocationService()),
       // ChangeNotifierProvider(create: (context) => StepCounterProvider()),
       ChangeNotifierProvider(create: (_) => StepTrackerServiceNotifier()),
       // ChangeNotifierProvider(create: (_) => TimerService()),
@@ -62,18 +64,16 @@ class MyAppState extends State<MyApp> {
     return _appLifecycleState == AppLifecycleState.resumed;
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        // Define the default brightness and colors.
         brightness: Brightness.light,
         primaryColor: Colors.lightBlue[800],
         hintColor: const Color(0xFFC7F9CC),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 184, 239, 186), // Set your desired color here
+            backgroundColor: const Color.fromARGB(255, 184, 239, 186), 
             textStyle: const TextStyle(
               fontSize: 15,
               color: Color.fromARGB(255, 255, 255, 255),
@@ -82,15 +82,8 @@ class MyAppState extends State<MyApp> {
           ),
         ),          
         appBarTheme: const AppBarTheme(
-          color: Color(0xFFC7F9CC), // Set your desired color here
+          color: Color(0xFFC7F9CC), 
         ),
-        // Define the default TextTheme. Use this to specify the default
-        // text styling for headlines, titles, bodies of text, and more.
-        // textTheme: TextTheme(
-        //   headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-        //   headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-        //   bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
-        // ),
       ),
       debugShowCheckedModeBanner: false,
       home: const DataLoaderPage(),

@@ -89,4 +89,10 @@ class DistanceChallenge extends Challenge with ChangeNotifier {
   bool isCompleted() {
     return progress >= 100;
   }
+
+  @override
+  void updateChallengeLocation(double lat, double lng) {
+    super.updateChallengeLocation(lat, lng);
+    notifyListeners();
+  }
 }

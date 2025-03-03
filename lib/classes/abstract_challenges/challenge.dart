@@ -18,6 +18,8 @@ abstract class Challenge {
   DateTime? endTime;
   final ChallengeType challengeType;
   ChallengeStatus challengeStatus;
+  double? latitude;
+  double? longitude;
 
   Challenge({
     required this.name,
@@ -27,29 +29,52 @@ abstract class Challenge {
     required this.id,
     required this.level,
     required this.challengeType,
-    this.challengeStatus = ChallengeStatus.inactive
+    this.challengeStatus = ChallengeStatus.inactive,
+    this.latitude,
+    this.longitude
   });
 
   bool isCompleted();
 
   Map<String, dynamic> toJson();
 
-  factory Challenge.fromJson(Map<String, dynamic> json){
+  late final DocumentReference? _fireStoreChallengeReference;
+
+  void setUserId(String userId) {
+    _fireStoreChallengeReference = FirebaseFirestore.instance
+      .collection("users")
+      .doc(userId.toString().padLeft(6, '0'))
+      .collection("userGames")
+      .doc("game_$id");
+  }
+
+  factory Challenge.fromJson(Map<String, dynamic> json) {
+
     ChallengeType type = json['type'] != null ? ChallengeType.fromValue(json['type']) : ChallengeType.steps;
+    Challenge challenge;
+
     switch (type) {
       case ChallengeType.steps:
-        return StepsChallenge.fromJson(json);
+        challenge = StepsChallenge.fromJson(json);
       case ChallengeType.speed:
-        return SpeedChallenge.fromJson(json);
+        challenge = SpeedChallenge.fromJson(json);
       case ChallengeType.distance:
-        return DistanceChallenge.fromJson(json);
+        challenge = DistanceChallenge.fromJson(json);
       case ChallengeType.duration:
-        return DurationChallenge.fromJson(json);
+        challenge = DurationChallenge.fromJson(json);
       case ChallengeType.influence:
-        return InfluenceChallenge.fromJson(json);
+        challenge = InfluenceChallenge.fromJson(json);
       default:
-        return StepsChallenge.fromJson(json);
+        challenge = StepsChallenge.fromJson(json);
     }
+
+    final userId = LazySingleton.instance.currentUser?.uniqueNumber;
+
+    if (userId != null) {
+      challenge.setUserId(userId.toString());
+    }
+
+    return challenge;
   }
 
   String? getFormattedStartTime() {
@@ -67,14 +92,12 @@ abstract class Challenge {
   void start() {
     startTime = DateTime.now();
     challengeStatus = ChallengeStatus.active;
-    // LazySingleton.instance.challengeInProgress = true;
     LazySingleton.instance.activeChallenge = this;
     print("$name challenge started! $startTime");
   }
 
   void resume() {
     challengeStatus = ChallengeStatus.active;
-    // LazySingleton.instance.challengeInProgress = true;
     LazySingleton.instance.activeChallenge = this;
     print("$name challenge continued! $startTime");
   }
@@ -82,15 +105,12 @@ abstract class Challenge {
   void end() {
     endTime = DateTime.now();
     challengeStatus = ChallengeStatus.ended;
-    // LazySingleton.instance.challengeInProgress = false;
     LazySingleton.instance.activeChallenge = null;
     print("$name challenge ended!");
   }
 
   void pause() {
-    // endTime = DateTime.now();
     challengeStatus = ChallengeStatus.paused;
-    // LazySingleton.instance.challengeInProgress = false;
     LazySingleton.instance.activeChallenge = null;
     print("$name challenge paused!");
   }
@@ -105,17 +125,81 @@ abstract class Challenge {
 
   void updateFirebase(Map<String, dynamic> jsonData) {
 
-    final userId = LazySingleton.instance.currentUser?.uniqueNumber;
+    // final userId = LazySingleton.instance.currentUser?.uniqueNumber;
 
-    if (userId == null) { return; }
+    // if (userId == null) { return; }
 
-    CollectionReference userChallenges = FirebaseFirestore.instance
-      .collection("users")
-      .doc(userId.toString().padLeft(6, '0'))
-      .collection("userGames");
+    // CollectionReference userChallenges = FirebaseFirestore.instance
+    //   .collection("users")
+    //   .doc(userId.toString().padLeft(6, '0'))
+    //   .collection("userGames");
 
-    userChallenges.doc("game_$id").set(jsonData);
+    // userChallenges.doc("game_$id").update(jsonData);
+
+    _fireStoreChallengeReference?.update(jsonData);
   }
+
+  void updateChallengeLocation(double lat, double lng) {
+
+    latitude = lat;
+    longitude = lng;
+
+    // final userId = LazySingleton.instance.currentUser?.uniqueNumber;
+
+    // if (userId == null) { return; }
+    
+    try {
+
+      final location = {
+        'latitude': latitude,
+        'longitude': longitude,
+        'timestamp': Timestamp.now(),
+      };
+
+      // CollectionReference userChallenges = FirebaseFirestore.instance
+      //   .collection("users")
+      //   .doc(userId.toString().padLeft(6, '0'))
+      //   .collection("userGames");
+
+      // await userChallenges.doc("game_$id").update({
+      //   'locations': FieldValue.arrayUnion([location]),
+      // });
+
+      _fireStoreChallengeReference?.update({
+        'locations': FieldValue.arrayUnion([location]),
+      });
+
+      print("🔥 Challenge location updated in Firestore!");  
+    } catch (e) {
+      print("❌ Error updating Firestore: $e");
+    }
+  }
+
+  void clearChallengeLocations() {
+    _fireStoreChallengeReference?.update({
+        'locations': FieldValue.arrayUnion([]),
+    });
+  }
+
+  // Future<void> addLocationToArray(double latitude, double longitude) async {
+  //   try {
+  //     // Create a location object with latitude, longitude, and timestamp
+  //     final location = {
+  //       'latitude': latitude,
+  //       'longitude': longitude,
+  //       'timestamp': FieldValue.serverTimestamp(),
+  //     };
+
+  //     // Add the location to the array in Firestore
+  //     await FirebaseFirestore.instance.collection('challenges').doc(challengeId).update({
+  //       'locations': FieldValue.arrayUnion([location]), // Append new location to array
+  //     });
+
+  //     print("🔥 Location added to array in Firestore!");
+  //   } catch (e) {
+  //     print("❌ Error adding location: $e");
+  //   }
+  // }
 }
 
 

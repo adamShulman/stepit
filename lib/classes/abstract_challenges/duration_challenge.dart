@@ -93,4 +93,10 @@ class DurationChallenge extends Challenge with ChangeNotifier {
   bool isCompleted() {
     return progress >= targetSteps;
   }
+
+  @override
+  void updateChallengeLocation(double lat, double lng) {
+    super.updateChallengeLocation(lat, lng);
+    notifyListeners();
+  }
 }

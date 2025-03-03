@@ -103,4 +103,10 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
     challengePedestrianStatus = pedestrianStatus;
     notifyListeners();
   }
+
+  @override
+  void updateChallengeLocation(double lat, double lng) {
+    super.updateChallengeLocation(lat, lng);
+    notifyListeners();
+  }
 }

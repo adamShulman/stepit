@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
 import 'package:stepit/utils/utils.dart';
+// import 'package:wakelock_plus/wakelock_plus.dart';
 
 typedef ChildCallbackBuilder = void Function(BuildContext context, void Function() methodFromChild);
 
@@ -27,22 +28,27 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
 
   void startChallenge() {
     widget.challenge.start();
+    // WakelockPlus.enable();
   }
 
   void pauseChallenge() {
     widget.challenge.pause();
+    // WakelockPlus.disable();
   }
 
   void resumeChallenge() {
     widget.challenge.resume();
+    // WakelockPlus.enable();
   }
 
   void endChallenge() {
     widget.challenge.end();
+    // WakelockPlus.disable();
   }
 
   void completeChallenge() {
     widget.challenge.complete();
+    // WakelockPlus.disable();
   }
 
   void toggleChallenge() {

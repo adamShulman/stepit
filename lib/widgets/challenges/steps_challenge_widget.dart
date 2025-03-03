@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/steps_challenge.dart';
+import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
 
@@ -21,7 +22,6 @@ class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
       children: [
         Text("Target Steps: ${challenge.targetSteps}"),
         Text("Progress: ${stepService.currentSteps} steps"),
-        // _StepProgress(),
         Text("Started time: ${challenge.getFormattedStartTime() ?? 0}"),
       ],
     );
@@ -34,26 +34,10 @@ class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
 
 class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
-  // int _stepCount = 0;
-  // bool _isTracking = false;
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   context.watch<StepTrackerServiceNotifier>();
-  //   return Consumer<StepTrackerServiceNotifier>(
-  //     builder: (context, stepService, child) {
-  //       // Ensure the challenge model is updated with the latest steps before building the widget
-  //       widget.challenge.progress = stepService.currentSteps;
-
-  //       return super.build(context);  // Return the widget tree
-  //     },
-  //   );
-  // }
-
-
   @override
   void initState() {
     super.initState();
+    
   }
 
   @override
@@ -67,6 +51,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
     // _isTracking = false;
     context.read<StepTrackerServiceNotifier>().pauseTracking();
+    context.read<LocationService>().stopTracking();
   }
   
   @override
@@ -75,6 +60,13 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
     // _isTracking = true;
     context.read<StepTrackerServiceNotifier>().startTracking();
+    // final locationService = context.watch<LocationService>();
+
+    final locationService = context.read<LocationService>();
+    locationService.currentChallenge = widget.challenge;
+
+    locationService.startTracking();
+    
   }
 
   @override
@@ -83,7 +75,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
     // _isTracking = true;
     context.read<StepTrackerServiceNotifier>().resumeTracking();
-    
+    context.read<LocationService>().startTracking();
   }
 
   @override
@@ -92,6 +84,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
     // _isTracking = false;
     context.read<StepTrackerServiceNotifier>().endTracking();
+    context.read<LocationService>().stopTracking();
   }
 
   @override
@@ -100,6 +93,7 @@ class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
     // _isTracking = false;
     context.read<StepTrackerServiceNotifier>().completeTracking();
+    context.read<LocationService>().stopTracking();
 
     String message;
     message = 'Congratulations! You have completed the challenge.';

@@ -15,9 +15,12 @@ class StepsChallenge extends Challenge with ChangeNotifier {
     required super.level,
     required super.challengeType,
     required this.targetSteps,
+    required this.progress,
     super.startTime,
     super.endTime,
-    super.challengeStatus 
+    super.challengeStatus,
+    super.latitude,
+    super.longitude
   });
 
 
@@ -32,6 +35,7 @@ class StepsChallenge extends Challenge with ChangeNotifier {
       targetSteps: json['target_steps'] ?? 0,
       startTime: json['start_time']?.toDate(),
       endTime: json['end_time']?.toDate(),
+      progress: json['steps'] ?? 0
     );
   }
 
@@ -89,5 +93,11 @@ class StepsChallenge extends Challenge with ChangeNotifier {
   @override
   bool isCompleted() {
     return challengeStatus == ChallengeStatus.completed;
+  }
+
+  @override
+  void updateChallengeLocation(double lat, double lng) {
+    super.updateChallengeLocation(lat, lng);
+    notifyListeners();
   }
 }
