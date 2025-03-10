@@ -1,19 +1,20 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:pedometer/pedometer.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 
 class SpeedChallenge extends Challenge with ChangeNotifier {
   
   final int? targetSpeed;
-  final int targetTime;
+  final int targetDuration;
 
   int progress = 0;
   int elapsedSeconds = 0;
 
-  ChallengePedestrianStatus challengePedestrianStatus = ChallengePedestrianStatus.unknown;
+  // ChallengePedestrianStatus challengePedestrianStatus = ChallengePedestrianStatus.unknown;
+
+  final ValueNotifier<ChallengePedestrianStatus> challengePedestrianStatus = ValueNotifier(ChallengePedestrianStatus.unknown);
 
   SpeedChallenge({
     required super.id,
@@ -22,7 +23,7 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
     required super.level,
     required super.challengeType,
     this.targetSpeed,
-    required this.targetTime,
+    required this.targetDuration,
     super.startTime,
     super.endTime,
     super.challengeStatus
@@ -37,7 +38,7 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
       level: json['level'] ?? 1,
       challengeType: ChallengeType.fromValue(json['type']),
       challengeStatus: json['status'] != null ? ChallengeStatus.fromString(json['status']) : ChallengeStatus.inactive,
-      targetTime: json['target_time'] ?? 0,
+      targetDuration: json['target_duration'] ?? 0,
       startTime: json['start_time']?.toDate(),
       endTime: json['end_time']?.toDate(),
     );
@@ -54,7 +55,7 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
       'start_time': startTime,
       'end_time': endTime,
       'steps': progress,
-      'target_time': targetTime,
+      'target_duration': targetDuration,
       'status': challengeStatus.description,
     };
   }
@@ -100,7 +101,7 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
   }
 
   void setPedestrianStatus(ChallengePedestrianStatus pedestrianStatus) {
-    challengePedestrianStatus = pedestrianStatus;
+    challengePedestrianStatus.value = pedestrianStatus;
     notifyListeners();
   }
 
@@ -108,5 +109,16 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
   void updateChallengeLocation(double lat, double lng) {
     super.updateChallengeLocation(lat, lng);
     notifyListeners();
+  }
+
+  @override
+  int getPoints() {
+    int points;
+    if (isCompleted()) {
+      points = (super.getCompletionPoints() + (progress / 10).toInt());
+    } else {
+      points = (progress / 10).toInt();
+    }
+    return points;
   }
 }

@@ -30,19 +30,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   }
   
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
-    //   _saveDataBeforeExit();
-    // }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   // if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+  //   //   _saveDataBeforeExit();
+  //   // }
+  // }
 
-  Future<void> _saveDataBeforeExit() async {
-    // challenges.forEach((challenge) {
-    //   challenge.end();
-    // });
-    print("data saved");
-  }
+  // Future<void> _saveDataBeforeExit() async {
+  //   // challenges.forEach((challenge) {
+  //   //   challenge.end();
+  //   // });
+  //   print("data saved");
+  // }
 
   
 
@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChallengePages(challenge: challenge)
+        builder: (context) => ChallengePage(challenge: challenge)
       ),
     );
   }
@@ -82,6 +82,49 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           child: Column(
             children: [
               const DailyStepCounter(),
+              // FutureBuilder(
+              //   future: _firestoreService.fetchUserChallenges(LazySingleton.instance.currentUser!.uniqueNumber),
+              //   builder: (context, snapshot) {
+
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return const Center(
+              //         child: Padding(
+              //           padding: EdgeInsets.only(top: 50.0),
+              //           child: CircularProgressIndicator(
+              //             color: Colors.white,
+              //           ),
+              //         ),
+              //       );
+              //     } else if (snapshot.hasData) {
+              //       final challenges = snapshot.data!;
+              //       // _challenges = challenges;
+
+              //       return Column(
+              //         children: [
+              //           const Text('Resume challenge'),
+              //           ListView.builder(
+              //             shrinkWrap: true,
+              //             physics: const NeverScrollableScrollPhysics(),
+              //             itemCount: challenges.length,
+              //             itemBuilder: (context, index) {
+              //               final challenge = challenges[index];
+              //               return Hero(
+              //                 tag: challenge.id,
+              //                 child: ChallengeUtils.buildChallengeWidget(
+              //                   challenge,
+              //                   onTap: () => _goToChallengeDetails(challenge),
+              //                 ),
+              //               );
+              //             },
+              //           ),
+              //         ],
+              //       );
+                     
+              //     } else {
+              //       return const SizedBox.shrink();
+              //     }
+              //   },
+              // ),
               FutureBuilder(
                 future: _firestoreService.fetchChallengesOnce(),
                 builder: (context, snapshot) {

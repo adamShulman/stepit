@@ -23,7 +23,6 @@ class StepsChallenge extends Challenge with ChangeNotifier {
     super.longitude
   });
 
-
   factory StepsChallenge.fromJson(Map<String, dynamic> json) {
     return StepsChallenge(
       id: json['identifier'],
@@ -35,7 +34,7 @@ class StepsChallenge extends Challenge with ChangeNotifier {
       targetSteps: json['target_steps'] ?? 0,
       startTime: json['start_time']?.toDate(),
       endTime: json['end_time']?.toDate(),
-      progress: json['steps'] ?? 0
+      progress: json['steps'] ?? 0,
     );
   }
 
@@ -52,6 +51,7 @@ class StepsChallenge extends Challenge with ChangeNotifier {
       'steps': progress,
       'target_steps': targetSteps,
       'status': challengeStatus.description,
+      'points': getPoints()
     };
   }
 
@@ -88,6 +88,7 @@ class StepsChallenge extends Challenge with ChangeNotifier {
     super.complete();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.updatePointsForUser(getPoints());
   }
 
   @override
@@ -95,9 +96,20 @@ class StepsChallenge extends Challenge with ChangeNotifier {
     return challengeStatus == ChallengeStatus.completed;
   }
 
+  // @override
+  // void updateChallengeLocation(double lat, double lng) {
+  //   super.updateChallengeLocation(lat, lng);
+  //   // notifyListeners();
+  // }
+
   @override
-  void updateChallengeLocation(double lat, double lng) {
-    super.updateChallengeLocation(lat, lng);
-    notifyListeners();
+  int getPoints() {
+    int points;
+    if (isCompleted()) {
+      points = (super.getCompletionPoints() + (progress / 10).toInt());
+    } else {
+      points = (progress / 10).toInt();
+    }
+    return points;
   }
 }

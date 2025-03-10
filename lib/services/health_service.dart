@@ -1,5 +1,6 @@
 
 
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -15,7 +16,7 @@ class HealthService {
 
   static const permissions = [HealthDataAccess.READ];
 
-  int _currentSteps = 0;
+  final int _currentSteps = 0;
 
   HealthConnectSdkStatus? _status;
 
@@ -26,11 +27,11 @@ class HealthService {
 
   Future<int> fetchStepData() async {
 
-    int? steps;
+    // int? steps;
 
     // get steps for today (i.e., since midnight)
-    final now = DateTime.now();
-    final midnight = DateTime(now.year, now.month, now.day);
+    // final now = DateTime.now();
+    // final midnight = DateTime(now.year, now.month, now.day);
 
     final healthConnectStatus = await getHealthConnectSdkStatus();
 
@@ -41,41 +42,43 @@ class HealthService {
       case HealthConnectSdkStatus.sdkUnavailable:
         return 0;
       case HealthConnectSdkStatus.sdkUnavailableProviderUpdateRequired:
-        installHealthConnect();
+        // installHealthConnect();
+        return 0;
       case HealthConnectSdkStatus.sdkAvailable:
-        break;
+        return 0;
+        // break;
     }
 
-    bool stepsPermission =
-        await health.hasPermissions([HealthDataType.STEPS]) ?? false;
-    if (!stepsPermission) {
-      stepsPermission =
-        await health.requestAuthorization([HealthDataType.STEPS]);
-    }
+    // bool stepsPermission =
+    //     await health.hasPermissions([HealthDataType.STEPS]) ?? false;
+    // if (!stepsPermission) {
+    //   stepsPermission =
+    //     await health.requestAuthorization([HealthDataType.STEPS]);
+    // }
 
-    if (stepsPermission) {
-      try {
-        steps = await health.getTotalStepsInInterval(midnight, now);
-      } catch (error) {
-        debugPrint("Exception in getTotalStepsInInterval: $error");
-      }
+    // if (stepsPermission) {
+    //   try {
+    //     steps = await health.getTotalStepsInInterval(midnight, now);
+    //   } catch (error) {
+    //     debugPrint("Exception in getTotalStepsInInterval: $error");
+    //   }
 
-      debugPrint('Total number of steps: $steps');
+    //   debugPrint('Total number of steps: $steps');
 
-      _currentSteps = steps ?? 0;
+    //   _currentSteps = steps ?? 0;
 
-    } else {
-      debugPrint("Authorization not granted - error in authorization");
-    }
+    // } else {
+    //   debugPrint("Authorization not granted - error in authorization");
+    // }
 
-    return steps ?? 0;
+    // return steps ?? 0;
   }
 
   Future<HealthConnectSdkStatus?> getHealthConnectSdkStatus() async {
     assert(Platform.isAndroid, "This is only available on Android");
 
     final status = await health.getHealthConnectSdkStatus();
-    print(status);
+    log('log: ${status.toString()}');
 
     return status;
   }

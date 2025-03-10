@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/services/firebase_service.dart';
 import 'package:stepit/services/health_service.dart';
 
 class DailyStepCounter extends StatefulWidget {
@@ -15,6 +17,7 @@ class DailyStepCounter extends StatefulWidget {
 class DailyStepCounterState extends State<DailyStepCounter> {
 
   final _healthService = HealthService();
+  final _firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +25,8 @@ class DailyStepCounterState extends State<DailyStepCounter> {
     final now = DateTime.now();
     final formattedDate = DateFormat('EEE').format(now);
     final formattedTime = DateFormat('jm').format(now);
+
+    final userId = LazySingleton.instance.currentUser.uniqueNumber;
 
     final date = '$formattedDate, $formattedTime';
 
@@ -36,21 +41,41 @@ class DailyStepCounterState extends State<DailyStepCounter> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.run_circle,
                       color: Colors.deepOrange,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 4.0,
                     ),
-                    Text(
-                      "Steps",
+                    FutureBuilder(
+                      future: _healthService.fetchStepData(),
+                      builder: (context, snapshot) {
+                        return Text(
+                          snapshot.data?.toString() ?? "0",
+                          maxLines: 1,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                          )
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      width: 4.0,
+                    ),
+                    const Text(
+                      "steps",
                       style: TextStyle(
-                        color: Colors.deepOrange
-                      ),
-                    )
+                        color: Colors.blueGrey,
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.normal,
+                        
+                      )
+                    ),
                   ],
                 ),
                 Row(
@@ -88,8 +113,8 @@ class DailyStepCounterState extends State<DailyStepCounter> {
               children: [
                 Row(
                   children: [
-                    FutureBuilder(
-                      future: _healthService.fetchStepData(),
+                    StreamBuilder(
+                      stream: _firestoreService.getUserPointsStream(userId),
                       builder: (context, snapshot) {
                         return Text(
                           snapshot.data?.toString() ?? "0",
@@ -115,7 +140,7 @@ class DailyStepCounterState extends State<DailyStepCounter> {
                       width: 4.0,
                     ),
                     const Text(
-                      "steps",
+                      "points",
                       style: TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 13.0,

@@ -31,18 +31,9 @@ class LazySingleton {
 
   Challenge? activeChallenge;
 
-  User? currentUser;
+  late final User currentUser;
 
-  bool isThereActiveChallenge() {
-    return activeChallenge != null;
-  }
-
-  bool canStartChallenge(int challengeId) {
-    if (activeChallenge != null && activeChallenge!.id != challengeId) {
-      return false;
-    } 
-    return true;
-  }
+  bool showMap = true;
 
   bool anotherChallengeInProgress(int challengeId) {
     if (activeChallenge != null && activeChallenge!.id != challengeId) {

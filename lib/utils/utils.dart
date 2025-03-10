@@ -29,6 +29,27 @@ class ChallengeUtils {
     };
   }
 
+  static IconData buttonIconDataFor(ChallengeStatus status) {
+
+    IconData icon;
+
+    switch (status) {
+      
+      case ChallengeStatus.inactive:
+        icon = Icons.play_arrow;
+      case ChallengeStatus.active:
+        icon = Icons.pause;
+      case ChallengeStatus.ended:
+        icon = Icons.alarm;
+      case ChallengeStatus.completed:
+        icon = Icons.alarm_on;
+      case ChallengeStatus.paused:
+        icon = Icons.play_arrow;
+    }
+
+    return icon;
+  }
+
   static String imageNameFor(Challenge challenge) {
 
     String icon = "";
@@ -86,6 +107,55 @@ class ChallengeUtils {
     }
     return icon;
  }
+
+  static List<Widget> floatingMenuButtons(ChallengeStatus challengeStatus) {
+
+    switch (challengeStatus) {
+
+      case ChallengeStatus.inactive:
+
+        return [
+          FloatingActionButton.small(
+            shape: const CircleBorder(),
+            heroTag: null,
+            child: const Icon(Icons.play_arrow),
+            onPressed: () {
+              // Navigator.of(context).push(
+              //     MaterialPageRoute(builder: ((context) => const NextPage())));
+            },
+          ),
+          FloatingActionButton.small(
+            shape: const CircleBorder(),
+            heroTag: null,
+            child: const Icon(Icons.map),
+            onPressed: () {
+              // Navigator.of(context).push(
+              //     MaterialPageRoute(builder: ((context) => const NextPage())));
+            },
+          ),
+        ];
+
+      case ChallengeStatus.active:
+
+      case ChallengeStatus.ended:
+
+      case ChallengeStatus.completed:
+      
+      case ChallengeStatus.paused:
+        
+    }
+    return [
+      FloatingActionButton.small(
+        shape: const CircleBorder(),
+        heroTag: null,
+        child: const Icon(Icons.search),
+        onPressed: () {
+          // Navigator.of(context).push(
+          //     MaterialPageRoute(builder: ((context) => const NextPage())));
+        },
+      ),
+    ];
+  }
  
 }
 

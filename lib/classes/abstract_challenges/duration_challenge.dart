@@ -99,4 +99,15 @@ class DurationChallenge extends Challenge with ChangeNotifier {
     super.updateChallengeLocation(lat, lng);
     notifyListeners();
   }
+
+  @override
+  int getPoints() {
+    int points;
+    if (isCompleted()) {
+      points = (super.getCompletionPoints() + (progress / 10).toInt());
+    } else {
+      points = (progress / 10).toInt();
+    }
+    return points;
+  }
 }

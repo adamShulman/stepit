@@ -1,10 +1,10 @@
 
-
-
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/influence_challenge.dart';
+import 'package:stepit/services/location_service.dart';
+import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
 
 
@@ -20,7 +20,7 @@ class InfluenceChallengeCard extends ChallengeCard<InfluenceChallenge> {
         Text("Required Photos: ${challenge.requiredPhotos}"),
         Text("Photos Taken: ${challenge.photosTaken}"),
         Text("Step Limit: ${challenge.stepLimit}"),
-        Text("Steps Used: ${challenge.progress ?? 0}"),
+        Text("Steps Used: ${challenge.progress}"),
       ],
     );
   }
@@ -31,92 +31,45 @@ class InfluenceChallengeCard extends ChallengeCard<InfluenceChallenge> {
 
 class _InfluenceChallengeCardState extends ChallengeCardState<InfluenceChallengeCard> {
 
-  int _stepCount = 0;
-
-  bool isActive = false;
-  
-  late StreamSubscription _periodicSub;
-
-  @override
-  void initState() {
-    _periodicSub = Stream.periodic(const Duration(milliseconds: 1000)).listen((_) {
-
-      switch (widget.challenge.challengeStatus) {
-        case ChallengeStatus.inactive:
-          isActive = false;
-          
-        case ChallengeStatus.active:
-          if (isActive) {
-
-          } else {
-            isActive = true;
-            _startChallenge();
-          }
-          
-        case ChallengeStatus.completed:
-          if (isActive) {
-            isActive = false;
-            _completeChallenge();
-          }
-         
-        case ChallengeStatus.ended:
-        if (isActive) {
-            isActive = false;
-            _endChallenge();
-          }
-
-          case ChallengeStatus.paused:
-          if (isActive) {
-            isActive = false;
-            // _pauseChallenge();
-          }
-         
-      }
-     
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _periodicSub.cancel();
-    super.dispose();
-  }
-
-  void _startChallenge() {
-    
-  }
-
-  void _completeChallenge() {
-
-    String message;
-    message = 'Congratulations! You have completed the challenge.';
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Challenge Completed!'),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _endChallenge() {
-
-
-  }
-  
   @override
   void startChallenge() {
-    // TODO: implement startChallenge
+    super.startChallenge();
+    context.read<StepTrackerServiceNotifier>().startTracking();
+
+    final locationService = context.read<LocationService>();
+    locationService.currentChallenge = widget.challenge;
+
+    locationService.startTracking();
+  }
+
+  @override
+  void pauseChallenge() {
+    super.pauseChallenge();
+    context.read<StepTrackerServiceNotifier>().pauseTracking();
+    context.read<LocationService>().stopTracking();
+  }
+  
+
+
+  @override
+  void resumeChallenge() {
+    super.resumeChallenge();
+    context.read<StepTrackerServiceNotifier>().resumeTracking();
+    context.read<LocationService>().startTracking();
+  }
+
+  @override
+  void endChallenge() {
+    super.endChallenge();
+    context.read<StepTrackerServiceNotifier>().endTracking();
+    context.read<LocationService>().stopTracking();
+  }
+
+  @override
+  void completeChallenge() {
+    super.completeChallenge();
+    context.read<StepTrackerServiceNotifier>().completeTracking();
+    context.read<LocationService>().stopTracking();
   }
 
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:stepit/pages/identification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,7 +61,7 @@ class _AgreementPageState extends State<AgreementPage> {
       }
 
     } catch (e) {
-      print("Error: $e");
+      log("Error: $e");
     }
   }
 
@@ -125,7 +127,7 @@ class _AgreementPageState extends State<AgreementPage> {
                 height: 12.0,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Checkbox(
                     checkColor: Colors.black,

@@ -1,9 +1,14 @@
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_confetti/flutter_confetti.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/services/dialog_service.dart';
 import 'package:stepit/utils/utils.dart';
-// import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 typedef ChildCallbackBuilder = void Function(BuildContext context, void Function() methodFromChild);
 
@@ -19,6 +24,10 @@ abstract class ChallengeCard<T extends Challenge> extends StatefulWidget {
 
   Widget buildContent(BuildContext context); 
 
+  Widget buildBottom(BuildContext context) {
+    return const SizedBox.shrink();
+  }
+
   @override
   ChallengeCardState createState();
 
@@ -26,29 +35,70 @@ abstract class ChallengeCard<T extends Challenge> extends StatefulWidget {
 
 abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
 
+  @override
+  void initState() {
+    super.initState();
+    widget.challenge.challengeStatusNotifier.addListener(_onStatusNotified);
+  }
+
+  void _onStatusNotified() {
+
+    final challengeStatus = widget.challenge.challengeStatusNotifier.value;
+
+    // if (challengeStatus == _previousChallengeStatus) { return; }
+
+    // _previousChallengeStatus = challengeStatus;
+
+    switch (challengeStatus) {
+
+      case ChallengeStatus.completed:
+        completeChallenge();
+      case ChallengeStatus.ended:
+        endChallenge();
+      default:
+        break;
+    }
+     log("Property changed: $challengeStatus");
+
+  }
+
   void startChallenge() {
     widget.challenge.start();
-    // WakelockPlus.enable();
+    WakelockPlus.enable();
+    
   }
 
   void pauseChallenge() {
     widget.challenge.pause();
-    // WakelockPlus.disable();
+    WakelockPlus.disable();
   }
 
   void resumeChallenge() {
     widget.challenge.resume();
-    // WakelockPlus.enable();
+    WakelockPlus.enable();
   }
 
   void endChallenge() {
     widget.challenge.end();
-    // WakelockPlus.disable();
+    WakelockPlus.disable();
   }
 
   void completeChallenge() {
     widget.challenge.complete();
-    // WakelockPlus.disable();
+    WakelockPlus.disable();
+
+    final message = 'Congratulations! You have completed the challenge. You just received ${widget.challenge.getPoints()} points.';
+    const title = 'Challenge Completed!';
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Confetti.launch(
+        context,
+        options: const ConfettiOptions(
+          particleCount: 100, spread: 70, y: 0.6,
+        )
+      );
+      DialogService().showSingleDialog(context, title, message);
+    });
   }
 
   void toggleChallenge() {
@@ -66,7 +116,6 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
           break;
         case ChallengeStatus.paused:
           resumeChallenge();
-
       }
   }
 
@@ -80,7 +129,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
         widget.onChallengeTap != null ? widget.onChallengeTap!() : ();
       },
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         elevation: 4,
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Padding(
@@ -133,10 +182,17 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
                   color: Colors.black
                 )
               ),
+              // widget.buildBottom(context)
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    widget.challenge.challengeStatusNotifier.removeListener(_onStatusNotified);
+    super.dispose();
   }
 }

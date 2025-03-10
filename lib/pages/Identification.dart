@@ -18,7 +18,6 @@ class IdentificationPage extends StatefulWidget {
 
 class _IdentificationPageState extends State<IdentificationPage> {
 
-  String? _username;
   int? _uniqueNumber;
   late String _gameType;
 
@@ -83,7 +82,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
       }
 
     } catch (e) {
-      print("Error during async tasks: $e");
+      debugPrint("Error during async tasks: $e");
     }
   }
 
@@ -101,7 +100,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
       return false;
     }
 
-    await saveUser(_usernameTextFieldController.text, _uniqueNumber!, _gameType, 1);
+    await saveUser(_usernameTextFieldController.text, _uniqueNumber!, _gameType, 1, 0);
     return true;
   }
 
@@ -124,7 +123,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      resizeToAvoidBottomInset : false,
+      resizeToAvoidBottomInset: false,
       appBar: const StepItAppBar(
         title: 'Welcome to StepIT',
       ),

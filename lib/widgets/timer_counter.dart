@@ -10,7 +10,9 @@ class TimerCounterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TimerService>(
+    return Builder(
+      builder: (context) {
+        return Consumer<TimerService>(
       builder: (context, timerService, child) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -44,5 +46,8 @@ class TimerCounterWidget extends StatelessWidget {
         );
       },
     );
+      },
+    );
+    
   }
 }

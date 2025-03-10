@@ -15,6 +15,12 @@ class FirestoreService {
     });
   }
 
+  Stream<int> getUserPointsStream(int userId) {
+    return _firestore.collection('users').where('uniqueNumber', isEqualTo: userId).snapshots().map((snapshot) {
+      return User.fromMap(snapshot.docs.first.data()).points;
+    });
+  }
+
   Stream<User> getUserStream(int userId)  {
     return _firestore.collection('users').where('uniqueNumber', isEqualTo: userId).snapshots().map((snapshot) {
       return User.fromMap(snapshot.docs.first.data());
@@ -46,28 +52,29 @@ class FirestoreService {
     return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
   }
 
-  Future<List<Challenge>> fetchChallengesOnceFromStream() async {
-    final snapshot = await _firestore.collection('games').snapshots().first;
+//   Future<List<Challenge>> fetchChallengesOnceFromStream() async {
+//     final snapshot = await _firestore.collection('games').snapshots().first;
+//     return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
+// }
+
+
+
+//   // Fetch challenges
+//   Stream<List<Challenge>> fetchChallenges() {
+//     return _firestore.collection('games').snapshots().map((snapshot) {
+//       return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
+//     });
+//   }
+
+  Future<List<Challenge>> fetchUserChallenges(int userId) async {
+    
+    final snapshot = await _firestore.collection('users')
+      .doc(userId.toString().padLeft(6, '0'))
+      .collection('userGames')
+      .get();
+
     return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
-}
 
-
-
-  // Fetch challenges
-  Stream<List<Challenge>> fetchChallenges() {
-    return _firestore.collection('games').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
-    });
-  }
-
-  Stream<List<Challenge>> fetchUserChallenges(int userId) {
-    return _firestore.collection('users')
-    .doc(userId.toString().padLeft(6, '0'))
-    .collection('userGames')
-    .snapshots()
-    .map((snapshot) {
-      return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
-    });
   }
 
   // Start a challenge

@@ -5,7 +5,7 @@ import 'package:stepit/classes/abstract_challenges/challenge.dart';
 class DistanceChallenge extends Challenge with ChangeNotifier {
 
   int progress = 0;
-  final double targetDistance;
+  final int targetDistance;
   
   DistanceChallenge({
     required super.id,
@@ -94,5 +94,16 @@ class DistanceChallenge extends Challenge with ChangeNotifier {
   void updateChallengeLocation(double lat, double lng) {
     super.updateChallengeLocation(lat, lng);
     notifyListeners();
+  }
+
+  @override
+  int getPoints() {
+    int points;
+    if (isCompleted()) {
+      points = (super.getCompletionPoints() + (progress / 10).toInt());
+    } else {
+      points = (progress / 10).toInt();
+    }
+    return points;
   }
 }

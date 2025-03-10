@@ -168,6 +168,9 @@ class StepTrackerServiceNotifier with ChangeNotifier {
     }
 
     _isTracking = true;
+    _initialSteps = 0;
+    _currentSteps = 0;
+    
     _subscription = Pedometer.stepCountStream.listen(
       (StepCount event) {
         if (_initialSteps == 0) _initialSteps = event.steps;
@@ -207,12 +210,12 @@ class StepTrackerServiceNotifier with ChangeNotifier {
 
   void pauseTracking() {
     _subscription?.pause(); 
-    notifyListeners();
+    // notifyListeners();
   }
 
   void resumeTracking() {
     _subscription?.resume();
-    notifyListeners();
+    // notifyListeners();
   }
 
   void endTracking() {
@@ -227,10 +230,10 @@ class StepTrackerServiceNotifier with ChangeNotifier {
     if (!_isTracking) return;
     _subscription?.cancel();
     _subscription = null;
-    _initialSteps = 0;
-    _currentSteps = 0;
+    // _initialSteps = 0;
+    // _currentSteps = 0;
     _isTracking = false;
-    notifyListeners();
+    // notifyListeners();
   }
 }
 

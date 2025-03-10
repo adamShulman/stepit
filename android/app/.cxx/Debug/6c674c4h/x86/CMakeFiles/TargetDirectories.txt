@@ -1,0 +1,2 @@
+/Users/adamshulman/Development/Flutter/stepit/stepit/android/app/.cxx/Debug/6c674c4h/x86/CMakeFiles/edit_cache.dir
+/Users/adamshulman/Development/Flutter/stepit/stepit/android/app/.cxx/Debug/6c674c4h/x86/CMakeFiles/rebuild_cache.dir
