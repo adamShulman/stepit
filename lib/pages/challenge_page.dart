@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/services/dialog_service.dart';
 import 'package:stepit/utils/utils.dart';
 import 'package:stepit/widgets/app_bar.dart';
 import 'package:stepit/widgets/background_gradient_container.dart';
@@ -81,23 +83,29 @@ class _ChallengePageState extends State<ChallengePage> {
             
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: ChallengeButton(
-                  text: _isAnotherChallengeInProgress
-                    ? 'Another challenge in progress' 
-                    : widget.challenge.challengeStatus.challengeButtonTitle,
-                  icon: _isAnotherChallengeInProgress 
-                    ? Icons.info
-                    : ChallengeUtils.buttonIconDataFor(widget.challenge.challengeStatus),
-                  shape: widget.challenge.challengeStatus == ChallengeStatus.active 
-                  ? const CustomOutlinedBorder() 
-                  : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                  onPressed: () {
-                    setState(() { 
-                        childCallback.call();
-                    });
-                  }, 
-                  
-                ),
+              child: ValueListenableBuilder(
+                valueListenable: widget.challenge.challengeStatusNotifier,
+                builder: (context, value, child) {
+                  return ChallengeButton(
+                    text: _isAnotherChallengeInProgress
+                      ? 'Another challenge in progress' 
+                      : value.challengeButtonTitle,
+                    icon: _isAnotherChallengeInProgress 
+                      ? Icons.info
+                      : ChallengeUtils.buttonIconDataFor(value),
+                    shape: widget.challenge.challengeStatus == ChallengeStatus.active 
+                    ? const CustomOutlinedBorder() 
+                    : RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                    onPressed: () {
+                      setState(() { 
+                          childCallback.call();
+                      });
+                    }, 
+                    
+                  );
+                },
+              )
+             
                
             ),
             
@@ -178,18 +186,6 @@ class _ChallengePageState extends State<ChallengePage> {
                   debugPrint('afterClose');
                 },
                 children: [
-                  // FloatingActionButton.small(
-                  //   shape: const CircleBorder(),
-                  //   heroTag: null,
-                  //   child: const Icon(Icons.share),
-                  //   onPressed: () {
-                  //     final state = _key.currentState;
-                  //     if (state != null) {
-                  //       debugPrint('isOpen:${state.isOpen}');
-                  //       state.toggle();
-                  //     }
-                  //   },
-                  // ),
                   Row(
                     children: [
                       const Text(
@@ -211,6 +207,12 @@ class _ChallengePageState extends State<ChallengePage> {
                             debugPrint('isOpen:${state.isOpen}');
                             state.toggle();
                           }
+                          DialogService().showSingleDialogToEndChallenge(
+                            context, 'End challenge', 
+                            'Are you sure you want to end the challenge? All progress will be erased.', 
+                            onCancel: () => (),
+                            onEnd: () => widget.challenge.end(),
+                          );
                         },
                       ),
                       
@@ -248,41 +250,7 @@ class _ChallengePageState extends State<ChallengePage> {
                   )
                   
                 ]
-                // children: [
-                //   FloatingActionButton.small(
-                //     // shape: const CircleBorder(),
-                //     heroTag: null,
-                //     child: const Icon(Icons.edit),
-                //     onPressed: () {
-                //       const SnackBar snackBar = SnackBar(
-                //         content: Text("SnackBar"),
-                //       );
-                      
-                //       // scaffoldKey.currentState?.showSnackBar(snackBar);
-                //     },
-                //   ),
-                //   FloatingActionButton.small(
-                //     shape: const CircleBorder(),
-                //     heroTag: null,
-                //     child: const Icon(Icons.search),
-                //     onPressed: () {
-                //       // Navigator.of(context).push(
-                //       //     MaterialPageRoute(builder: ((context) => const NextPage())));
-                //     },
-                //   ),
-                  // FloatingActionButton.small(
-                  //   shape: const CircleBorder(),
-                  //   heroTag: null,
-                  //   child: const Icon(Icons.share),
-                  //   onPressed: () {
-                  //     final state = _key.currentState;
-                  //     if (state != null) {
-                  //       debugPrint('isOpen:${state.isOpen}');
-                  //       state.toggle();
-                  //     }
-                  //   },
-                  // ),
-                // ],
+                
               );
             default:
               return const SizedBox.shrink();

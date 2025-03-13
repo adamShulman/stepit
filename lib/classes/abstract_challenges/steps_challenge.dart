@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 
 class StepsChallenge extends Challenge with ChangeNotifier {
   
@@ -81,6 +83,7 @@ class StepsChallenge extends Challenge with ChangeNotifier {
     super.end();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.removeFromFirestoreChallengeToResume();
   }
 
   @override 
@@ -89,6 +92,7 @@ class StepsChallenge extends Challenge with ChangeNotifier {
     notifyListeners();
     super.updateFirebase(toJson());
     super.updatePointsForUser(getPoints());
+    super.removeFromFirestoreChallengeToResume();
   }
 
   @override
@@ -96,11 +100,12 @@ class StepsChallenge extends Challenge with ChangeNotifier {
     return challengeStatus == ChallengeStatus.completed;
   }
 
-  // @override
-  // void updateChallengeLocation(double lat, double lng) {
-  //   super.updateChallengeLocation(lat, lng);
-  //   // notifyListeners();
-  // }
+  @override
+  void updateProgress(int progress) {
+    super.updateProgress(progress);
+    this.progress = progress; //+ initialSteps;
+    notifyListeners();
+  }
 
   @override
   int getPoints() {

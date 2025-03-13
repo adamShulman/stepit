@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_pedestrian_status.dart';
 import 'package:stepit/classes/abstract_challenges/speed_challenge.dart';
 import 'package:stepit/services/location_service.dart';
+import 'package:stepit/services/pedestrian_status_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/services/timer_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
@@ -15,24 +17,31 @@ class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
   @override
   Widget buildContent(BuildContext context) {
 
-    final stepService = context.watch<StepTrackerServiceNotifier>();
+    // final stepService = context.watch<StepTrackerServiceNotifier>();
 
-    challenge.challengePedestrianStatus.value = stepService.challengePedestrianStatus;
+    // challenge.challengePedestrianStatus.value = stepService.challengePedestrianStatus;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Target: ${challenge.targetDuration} min"),
-        Text("Progress: ${challenge.progress} min"),
-        challenge.challengeStatus == ChallengeStatus.active 
-        ? Text("Pedestrian status: ${challenge.challengePedestrianStatus.value.description}") 
-        : const SizedBox.shrink(),
+        // Text("Progress: ${challenge.progress} min"),
+        ValueListenableBuilder(
+          valueListenable: challenge.challengePedestrianStatus,
+          builder: (context, value, child) {
+            return Text("Pedestrian status: ${challenge.challengePedestrianStatus.value.description}"); 
+          },
+        ),
+        // challenge.challengeStatus == ChallengeStatus.active 
+        // ? Text("Pedestrian status: ${challenge.challengePedestrianStatus.value.description}") 
+        // : const SizedBox.shrink(),
         // Text("time in seconds: ${challenge.elapsedSeconds}"),
         // const TimerCounterWidget(),
         Builder(
           builder: (context) {
             return Consumer<TimerService>(
               builder: (context, timerService, child) {
+               challenge.elapsedSeconds = timerService.elapsedSeconds;
                return timerService.currentChallengeId == challenge.id ?
                  Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -96,33 +105,42 @@ class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
 
 class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
 
-  @override
-  void initState() {
-    super.initState();
-    widget.challenge.challengePedestrianStatus.addListener(_onStatusNotified);
+  LocationService get _locationService {
+    return context.read<LocationService>();
+  }
+
+  StepTrackerServiceNotifier get _stepTrackerService {
+    return context.read<StepTrackerServiceNotifier>();
+  }
+
+  PedestrianTrackerServiceNotifier get _pedestrianStatusService {
+    return context.read<PedestrianTrackerServiceNotifier>();
+  }
+
+  TimerService get _timerService {
+    return context.read<TimerService>();
   }
 
   void _onStatusNotified() {
 
     final challengePedestrianStatus = widget.challenge.challengePedestrianStatus.value;
-    final timerService = context.read<TimerService>();
 
     switch (challengePedestrianStatus) {
       
       case ChallengePedestrianStatus.walking:
-        timerService.resumeTimer(widget.challenge.id);
+        _timerService.resumeTimer(widget.challenge.id, elapsedSeconds: widget.challenge.elapsedSeconds);
       case ChallengePedestrianStatus.stopped:
-        timerService.pauseTimer();
+        _timerService.pauseTimer();
       case ChallengePedestrianStatus.unknown:
-        timerService.pauseTimer();
+        _timerService.pauseTimer();
     }
   }
 
-  @override
-  void dispose() {
-    widget.challenge.challengePedestrianStatus.removeListener(_onStatusNotified);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   // widget.challenge.challengePedestrianStatus.removeListener(_onStatusNotified);
+  //   super.dispose();
+  // }
 
   @override
   void startChallenge() {
@@ -131,14 +149,14 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
     final challengePedestrianStatus = widget.challenge.challengePedestrianStatus.value;
 
     if(challengePedestrianStatus == ChallengePedestrianStatus.walking) {
-      context.read<TimerService>().startTimer(widget.challenge.id, reset: true);
+      _timerService.startTimer(widget.challenge.id, elapsedSeconds: widget.challenge.elapsedSeconds);
     }
 
-    context.read<StepTrackerServiceNotifier>().startPedestrianStateTracking();
+    _stepTrackerService.startTracking(widget.challenge, progress: widget.challenge.progress);
+    _pedestrianStatusService.startTracking(widget.challenge);
+    _locationService.startTracking();
 
-    final locationService = context.read<LocationService>();
-    locationService.currentChallenge = widget.challenge;
-    locationService.startTracking();
+    widget.challenge.challengePedestrianStatus.addListener(_onStatusNotified);
 
   }
 
@@ -146,11 +164,11 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
   void pauseChallenge() {
     super.pauseChallenge();
 
-    context.read<TimerService>().pauseTimer();
-
-    context.read<StepTrackerServiceNotifier>().pausePedestrianStatusTracking();
-
-    context.read<LocationService>().stopTracking();
+    _timerService.pauseTimer();
+    _stepTrackerService.pauseTracking();
+    _pedestrianStatusService.pauseTracking();
+    _locationService.pauseTracking();
+    widget.challenge.challengePedestrianStatus.removeListener(_onStatusNotified);
     
   }
   
@@ -159,26 +177,32 @@ class _SpeedChallengeCardState extends ChallengeCardState<SpeedChallengeCard> {
     super.resumeChallenge();
 
     final challengePedestrianStatus = widget.challenge.challengePedestrianStatus.value;
-
     if(challengePedestrianStatus == ChallengePedestrianStatus.walking) {
-      context.read<TimerService>().resumeTimer(widget.challenge.id);
+      _timerService.resumeTimer(widget.challenge.id, elapsedSeconds: widget.challenge.elapsedSeconds);
     }
 
-    context.read<StepTrackerServiceNotifier>().resumePedestrianStatusTracking();
-    context.read<LocationService>().startTracking();
+    _pedestrianStatusService.resumeTracking(widget.challenge);
+    _stepTrackerService.resumeTracking(widget.challenge, progress: widget.challenge.progress);
+    _locationService.resumeTracking();
+
+    widget.challenge.challengePedestrianStatus.addListener(_onStatusNotified);
   }
 
   @override
   void endChallenge() {
     super.endChallenge();
-    context.read<TimerService>().stopTimer();
-    context.read<LocationService>().stopTracking();
+    _timerService.stopTimer();
+    _locationService.endTracking();
+    _pedestrianStatusService.endTracking();
+    widget.challenge.challengePedestrianStatus.removeListener(_onStatusNotified);
   }
 
   @override
   void completeChallenge() {
     super.completeChallenge();
-    context.read<TimerService>().stopTimer();
-    context.read<LocationService>().stopTracking();
+    _timerService.stopTimer();
+    _locationService.completeTracking();
+    _pedestrianStatusService.completeTracking();
+    widget.challenge.challengePedestrianStatus.removeListener(_onStatusNotified);
   }
 }

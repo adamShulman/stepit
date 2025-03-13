@@ -3,8 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_confetti/flutter_confetti.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
 import 'package:stepit/services/dialog_service.dart';
 import 'package:stepit/utils/utils.dart';
@@ -38,19 +41,14 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
   @override
   void initState() {
     super.initState();
-    widget.challenge.challengeStatusNotifier.addListener(_onStatusNotified);
+    // widget.challenge.challengeStatusNotifier.addListener(_onStatusNotified);
   }
 
   void _onStatusNotified() {
 
     final challengeStatus = widget.challenge.challengeStatusNotifier.value;
 
-    // if (challengeStatus == _previousChallengeStatus) { return; }
-
-    // _previousChallengeStatus = challengeStatus;
-
     switch (challengeStatus) {
-
       case ChallengeStatus.completed:
         completeChallenge();
       case ChallengeStatus.ended:
@@ -58,6 +56,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
       default:
         break;
     }
+
      log("Property changed: $challengeStatus");
 
   }
@@ -98,6 +97,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
         )
       );
       DialogService().showSingleDialog(context, title, message);
+      
     });
   }
 
@@ -105,18 +105,31 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
 
     if (LazySingleton.instance.anotherChallengeInProgress(widget.challenge.id)) { return; }
 
-      switch (widget.challenge.challengeStatus) {
-        case ChallengeStatus.inactive:
-          startChallenge();
-        case ChallengeStatus.active:
-          pauseChallenge();
-        case ChallengeStatus.completed:
-          break;
-        case ChallengeStatus.ended:
-          break;
-        case ChallengeStatus.paused:
-          resumeChallenge();
-      }
+    switch (widget.challenge.challengeStatus) {
+      case ChallengeStatus.inactive:
+        startChallenge();
+        HapticFeedback.mediumImpact();
+        break;
+      case ChallengeStatus.active:
+        pauseChallenge();
+        HapticFeedback.selectionClick();
+        break;
+      case ChallengeStatus.paused:
+        resumeChallenge();
+        HapticFeedback.selectionClick();
+        break;
+      case ChallengeStatus.completed:
+        HapticFeedback.heavyImpact();
+        break;
+      case ChallengeStatus.ended:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    // widget.challenge.challengeStatusNotifier.removeListener(_onStatusNotified);
+    super.dispose();
   }
 
   @override
@@ -175,24 +188,24 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
               const SizedBox(height: 8.0),
               widget.buildContent(context),
               const SizedBox(height: 12.0),
-              Text(
-                "Status: ${widget.challenge.challengeStatus.description}",
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.black
-                )
-              ),
+              ValueListenableBuilder<ChallengeStatus>(
+                valueListenable: widget.challenge.challengeStatusNotifier,
+                builder: (context, value, child) {
+                  return Text(
+                    "Status: ${value.description}",
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.black
+                    )
+                  );
+                },
+              )
+              
               // widget.buildBottom(context)
             ],
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    widget.challenge.challengeStatusNotifier.removeListener(_onStatusNotified);
-    super.dispose();
   }
 }

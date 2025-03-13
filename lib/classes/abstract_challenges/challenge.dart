@@ -1,15 +1,16 @@
 
 import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_pedestrian_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 import 'package:stepit/classes/abstract_challenges/distance_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/duration_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/influence_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/speed_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/steps_challenge.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/services/firebase_service.dart';
 
 abstract class Challenge {
 
@@ -26,6 +27,14 @@ abstract class Challenge {
 
   final ValueNotifier<ChallengeStatus> challengeStatusNotifier = ValueNotifier(ChallengeStatus.inactive);
 
+  String get _userId {
+    return LazySingleton.instance.currentUser.uniqueNumber.toString().padLeft(6, '0');
+  }
+
+  String get _challengeStatusFirestoreCollectionRef {
+    return challengeStatus.challengeFirestoreCollectionRef;
+  }
+
   Challenge({
     required this.name,
     required this.description,
@@ -39,7 +48,7 @@ abstract class Challenge {
     this.longitude
   });
 
-  factory Challenge.fromJson(Map<String, dynamic> json) {
+  factory Challenge.fromJson(Map<String, dynamic> json, { ChallengeStatus? challengeStatus }) {
 
     ChallengeType type = json['type'] != null ? ChallengeType.fromValue(json['type']) : ChallengeType.steps;
     Challenge challenge;
@@ -57,6 +66,11 @@ abstract class Challenge {
         challenge = InfluenceChallenge.fromJson(json);
       }
 
+      if (challengeStatus != null) {
+        challenge.challengeStatus = challengeStatus; 
+        challenge.challengeStatusNotifier.value = challengeStatus;
+      }
+
     return challenge;
   }
 
@@ -70,17 +84,15 @@ abstract class Challenge {
     return 500;
   }
 
-  String? getFormattedStartTime() {
-    if (startTime == null ) { return null; }
-    DateFormat dateFormat = DateFormat("HH:mm:ss");
-    return dateFormat.format(startTime!);
+  void updateProgress(int progress) {
+    log('Progress updated: $progress');
   }
 
-  String? getFormattedEndTime() {
-    if (endTime == null ) { return null; }
-    DateFormat dateFormat = DateFormat("HH:mm:ss");
-    return dateFormat.format(endTime!);
+  void updatePedestrianStatus(ChallengePedestrianStatus status) {
+    log('Pedestrian status updated: ${status.description}');
   }
+
+  //MARK:- Challenge control methods.
 
   void start() {
     startTime = DateTime.now();
@@ -88,6 +100,13 @@ abstract class Challenge {
     challengeStatusNotifier.value = challengeStatus;
     LazySingleton.instance.activeChallenge = this;
     log("$name challenge started! $startTime");
+  }
+
+  void pause() {
+    challengeStatus = ChallengeStatus.paused;
+    challengeStatusNotifier.value = challengeStatus;
+    LazySingleton.instance.activeChallenge = null;
+    log("$name challenge paused!");
   }
 
   void resume() {
@@ -105,18 +124,6 @@ abstract class Challenge {
     log("$name challenge ended!");
   }
 
-  void pause() {
-    challengeStatus = ChallengeStatus.paused;
-    challengeStatusNotifier.value = challengeStatus;
-    LazySingleton.instance.activeChallenge = null;
-    log("$name challenge paused!");
-  }
-
-  void statusNotify(ChallengeStatus status) {
-    if (challengeStatusNotifier.value == status) { return; }
-    challengeStatusNotifier.value = status;
-  }
-
   void complete() {
     endTime = DateTime.now();
     challengeStatus = ChallengeStatus.completed;
@@ -126,193 +133,40 @@ abstract class Challenge {
     log("$name challenge completed!");
   }
 
+   void statusNotify(ChallengeStatus status) {
+    if (challengeStatusNotifier.value == status) { return; }
+    challengeStatusNotifier.value = status;
+  }
+
+  //MARK:- Firestore methods.
+
   void updateFirebase(Map<String, dynamic> jsonData) {
+    final FirestoreService firestoreService = FirestoreService();
+    firestoreService.updateUserChallenge(jsonData, _userId, _challengeStatusFirestoreCollectionRef, id);
+  }
 
-    final userId = LazySingleton.instance.currentUser.uniqueNumber;
-
-    final fireStoreChallengeReference = FirebaseFirestore.instance
-      .collection("users")
-      .doc(userId.toString().padLeft(6, '0'))
-      .collection("userGames")
-      .doc("game_$id");
-
-    fireStoreChallengeReference.set(jsonData, SetOptions(merge: true));
-
-    // _fireStoreChallengeReference?.set(jsonData, SetOptions(merge: true));
+  void removeFromFirestoreChallengeToResume() async {
+    final FirestoreService firestoreService = FirestoreService();
+    firestoreService.removeFromFirestoreChallengeToResume(_userId, _challengeStatusFirestoreCollectionRef, id);
   }
 
   void updatePointsForUser(int points) {
-
-    final userId = LazySingleton.instance.currentUser.uniqueNumber;
-
-    try {
-      
-      final fireStoreChallengeReference = FirebaseFirestore.instance
-        .collection("users")
-        .doc(userId.toString().padLeft(6, '0'));
-
-      fireStoreChallengeReference.update({'points': FieldValue.increment(points)});
-
-    } catch (error) {
-      log(error.toString());
-    }
-
+    final FirestoreService firestoreService = FirestoreService();
+    firestoreService.updatePointsForUser(points, _userId);
   }
 
   void updateChallengeLocation(double lat, double lng) {
 
-    final userId = LazySingleton.instance.currentUser.uniqueNumber;
-
     latitude = lat;
     longitude = lng;
-    
-    final String now = DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.now());
-    
-    try {
 
-      final location = {
-        'latitude': latitude,
-        'longitude': longitude,
-        'timestamp': FieldValue.serverTimestamp(),
-      };
-
-      final fireStoreChallengeReference = FirebaseFirestore.instance
-        .collection("users")
-        .doc(userId.toString().padLeft(6, '0'))
-        .collection("userGames")
-        .doc("game_$id");
-
-      fireStoreChallengeReference.collection("locations").doc(now).set(location);
-
-      // CollectionReference userChallenges = FirebaseFirestore.instance
-      //   .collection("users")
-      //   .doc(userId.toString().padLeft(6, '0'))
-      //   .collection("userGames");
-
-      // await userChallenges.doc("game_$id").update({
-      //   'locations': FieldValue.arrayUnion([location]),
-      // });
-
-      // _fireStoreChallengeReference?.collection("locations").doc(now).set(location);
-
-      // _fireStoreChallengeReference?.update({
-      //   'locations': FieldValue.arrayUnion([location]),
-      // });
-
-      log("🔥 Challenge location updated in Firestore!");  
-    } catch (e) {
-      log("❌ Error updating Firestore: $e");
-    }
+    final FirestoreService firestoreService = FirestoreService();
+    firestoreService.updateChallengeLocation(lat, lng, _userId, _challengeStatusFirestoreCollectionRef, id);
+        
   }
 
   Future<void> clearLocationsSubCollection() async {
-
-    final userId = LazySingleton.instance.currentUser.uniqueNumber;
-
-    final fireStoreChallengeReference = FirebaseFirestore.instance
-        .collection("users")
-        .doc(userId.toString().padLeft(6, '0'))
-        .collection("userGames")
-        .doc("game_$id");
-    
-    final collection = await fireStoreChallengeReference.collection("locations").get();
-
-    final batch = FirebaseFirestore.instance.batch();
-
-    for (final doc in collection.docs) {
-      batch.delete(doc.reference);
-    }
-    
-    return batch.commit();
-  }
-
-  void fetchSomething({required String data}) {}
-}
-
-
-enum ChallengeStatus {
-  inactive,
-  active,
-  ended,
-  completed,
-  paused;
-
-  factory ChallengeStatus.fromString(String description) { return ChallengeStatus.values.firstWhere((x) => x.description == description); }
-}
-
-extension ChallengeStatusExtension on ChallengeStatus {
-  String get description {
-    switch (this) {
-      case ChallengeStatus.inactive:
-        return "Inactive";
-      case ChallengeStatus.active:
-        return "Active";
-      case ChallengeStatus.ended:
-        return "Ended";
-      case ChallengeStatus.completed:
-        return "Completed";
-      case ChallengeStatus.paused:
-        return "Paused";
-    }
-  }
-}
-
-extension ChallengeStatusActionButtonTitleExtension on ChallengeStatus {
-  String get challengeButtonTitle {
-    switch (this) {
-      case ChallengeStatus.inactive:
-        return "Start challenge";
-      case ChallengeStatus.active:
-        return "Pause challenge";
-      case ChallengeStatus.ended:
-        return "Challenge ended";
-      case ChallengeStatus.completed:
-        return "Challenge completed";
-      case ChallengeStatus.paused:
-        return "Resume challenge";
-    }
-  }
-}
-
-enum ChallengeType {
-
-  steps,
-  speed,
-  distance,
-  duration,
-  influence;
-
-  factory ChallengeType.fromValue(int value) { return ChallengeType.values.firstWhere((x) => x.value == value); }
-}
-
-extension ChallengeTypeExtension on ChallengeType {
-  int get value {
-    switch (this) {
-      case ChallengeType.steps:
-        return 0;
-      case ChallengeType.speed:
-        return 1;
-      case ChallengeType.duration:
-        return 2;
-      case ChallengeType.distance:
-        return 3;
-      case ChallengeType.influence:
-        return 4;
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case ChallengeType.steps:
-        return "Steps";
-      case ChallengeType.speed:
-        return "Speed";
-      case ChallengeType.duration:
-        return "Duration";
-      case ChallengeType.distance:
-        return "Distance";
-      case ChallengeType.influence:
-        return "Influence";
-    }
+    final FirestoreService firestoreService = FirestoreService();
+    firestoreService.clearLocationsSubCollection(_userId, _challengeStatusFirestoreCollectionRef, id);
   }
 }

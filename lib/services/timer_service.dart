@@ -12,16 +12,18 @@ class TimerService with ChangeNotifier {
   int get elapsedSeconds => _elapsedSeconds;
   bool get isRunning => !_isPaused;
 
-  int? currentChallengeId;
+  int? _currentChallengeId;
+  int? get currentChallengeId => _currentChallengeId;
 
-  void startTimer(int challengeId, {int? autoStopAfterSeconds, bool reset = false}) {
+  void startTimer(int challengeId, {int? autoStopAfterSeconds, int elapsedSeconds = 0}) {
 
     if (!_isPaused) return;
-    if (reset) { _elapsedSeconds = 0; }
-    currentChallengeId = challengeId;
 
     _isPaused = false;
+    _currentChallengeId = challengeId;
     _autoStopDuration = autoStopAfterSeconds;
+    _elapsedSeconds = elapsedSeconds;
+
     _timer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_isPaused == false) {
         _elapsedSeconds++;
@@ -41,12 +43,9 @@ class TimerService with ChangeNotifier {
     _timer = null;
   }
 
-  void resumeTimer(int challengeId, {int? elapsedSeconds}) {
+  void resumeTimer(int challengeId, {int elapsedSeconds = 0}) {
      if (!_isPaused) return;
-     if (elapsedSeconds != null) { _elapsedSeconds = elapsedSeconds; }
-     currentChallengeId = challengeId;
-    // _isPaused = false;
-     startTimer(challengeId, autoStopAfterSeconds: _autoStopDuration);
+     startTimer(challengeId, autoStopAfterSeconds: _autoStopDuration, elapsedSeconds: elapsedSeconds);
   }
 
   void stopTimer() {

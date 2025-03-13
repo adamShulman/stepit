@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:stepit/classes/abstract_challenges/challenge.dart';
 
 // class StepTrackerService {
 
@@ -140,16 +141,15 @@ class StepTrackerServiceNotifier with ChangeNotifier {
   StepTrackerServiceNotifier._internal();
 
   StreamSubscription<StepCount>? _subscription;
-  StreamSubscription<PedestrianStatus>? _pedestrianStatusSubscription;
 
   int _initialSteps = 0;
   int _currentSteps = 0;
   bool _isTracking = false;
-  ChallengePedestrianStatus _pedestrianStatus = ChallengePedestrianStatus.unknown;
 
   int get currentSteps => _currentSteps;
-  bool get isTracking => _isTracking;
-  ChallengePedestrianStatus get challengePedestrianStatus => _pedestrianStatus;
+  int get overallSteps => _initialSteps + _currentSteps;
+
+  late Challenge? _currentChallenge;
 
   Future<bool> _checkPermission() async {
     final status = await Permission.activityRecognition.status;
@@ -158,7 +158,7 @@ class StepTrackerServiceNotifier with ChangeNotifier {
     return result.isGranted;
   }
 
-  Future<void> startTracking() async {
+  Future<void> startTracking(Challenge challenge, {int initialSteps = 0, int progress = 0}) async {
     if (_isTracking) return;
 
     final hasPermission = await _checkPermission();
@@ -167,93 +167,70 @@ class StepTrackerServiceNotifier with ChangeNotifier {
       return;
     }
 
+    _currentChallenge = challenge;
+
     _isTracking = true;
-    _initialSteps = 0;
-    _currentSteps = 0;
-    
-    _subscription = Pedometer.stepCountStream.listen(
-      (StepCount event) {
-        if (_initialSteps == 0) _initialSteps = event.steps;
-        _currentSteps = event.steps - _initialSteps;
-        notifyListeners(); 
-      },
+    _initialSteps = initialSteps;
+     _currentSteps = 0;
+
+    _subscription = Pedometer.stepCountStream     
+      .skipWhile((StepCount event) => _isTracking == false)
+      .listen(
+        (StepCount event) {
+          if (_initialSteps == 0) _initialSteps = event.steps;
+          _currentSteps = event.steps - _initialSteps;
+          _currentChallenge?.updateProgress(_currentSteps + progress);
+        },
       onError: (error) => notifyListeners(),
       cancelOnError: true,
     );
-    notifyListeners();
-  }
-
-  Future<void> startPedestrianStateTracking() async {
-
-    if (_pedestrianStatusSubscription != null) { return; }
     
-    _pedestrianStatusSubscription = Pedometer.pedestrianStatusStream.listen(
-      (PedestrianStatus event) {
-        _pedestrianStatus = ChallengePedestrianStatus.fromString(event.status);
-        notifyListeners(); 
-      }
-    );
     notifyListeners();
   }
 
-  void pausePedestrianStatusTracking() {
-    _pedestrianStatusSubscription?.pause();
+
+  void setInitialSteps(int steps) {
+    _initialSteps = steps;
   }
 
-  void resumePedestrianStatusTracking() {
-    _pedestrianStatusSubscription?.resume();
+  void setCurrentSteps(int steps) {
+    _currentSteps = steps;
   }
 
   bool isPaused() {
     return _subscription?.isPaused ?? false;
   }
 
-  void pauseTracking() {
-    _subscription?.pause(); 
-    // notifyListeners();
+  void resumeTracking(Challenge challenge, {int initialSteps = 0, int progress = 0}) {
+    startTracking(challenge, initialSteps: initialSteps, progress: progress);
   }
 
-  void resumeTracking() {
-    _subscription?.resume();
-    // notifyListeners();
+  void pauseTracking() {
+    stopTracking();
   }
 
   void endTracking() {
-    _stopTracking();
+    stopTracking();
   }
 
   void completeTracking() {
-    _stopTracking();
+    stopTracking();
   }
 
-  void _stopTracking() {
-    if (!_isTracking) return;
+  void stopTracking() {
     _subscription?.cancel();
     _subscription = null;
-    // _initialSteps = 0;
-    // _currentSteps = 0;
+    _initialSteps = 0;
+    _currentSteps = 0;
     _isTracking = false;
+    _currentChallenge = null;
     // notifyListeners();
   }
-}
 
-enum ChallengePedestrianStatus {
-  walking,
-  stopped,
-  unknown;
-
-  factory ChallengePedestrianStatus.fromString(String description) { return ChallengePedestrianStatus.values.firstWhere((x) => x.description == description); }
-}
-
-extension ChallengeStatusExtension on ChallengePedestrianStatus {
-  String get description {
-    switch (this) {
-      case ChallengePedestrianStatus.walking:
-        return "walking";
-      case ChallengePedestrianStatus.stopped:
-        return "stopped";
-      case ChallengePedestrianStatus.unknown:
-        return "unknown";
-    }
+  @override
+  void dispose() {
+    stopTracking();
+    super.dispose();
   }
 }
+

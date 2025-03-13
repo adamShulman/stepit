@@ -2,9 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
 import 'package:stepit/classes/abstract_challenges/steps_challenge.dart';
 import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
+import 'package:stepit/utils/utils.dart';
 import 'package:stepit/widgets/challenge_card.dart';
 
 class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
@@ -13,129 +15,104 @@ class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
 
   @override
   Widget buildContent(BuildContext context) {
-    
-    final stepService = context.watch<StepTrackerServiceNotifier>();
-    // final currentPosition = context.watch<LocationService>().currentPosition;
-   
-    if (stepService.currentSteps >= challenge.targetSteps) {
-      challenge.progress = challenge.targetSteps;
-      challenge.statusNotify(ChallengeStatus.completed);
-      // challenge.challengeStatusNotifier.value = ChallengeStatus.completed;
-    } else {
-      challenge.progress = stepService.currentSteps;
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Target Steps: ${challenge.targetSteps}"),
-        // Text("Progress: ${stepService.currentSteps} steps"),
         ListenableBuilder(
-          listenable: stepService,
+          listenable: challenge,
           builder: (context, child) {
             return Text('Progress: ${challenge.progress} steps');
           },
         ),
-        Text("Started time: ${challenge.getFormattedStartTime() ?? 0}"),
-        // SizedBox(
-        //   width: 50.0,
-        //   height: 50.0,
-        //   child: AspectRatio(
-        //     aspectRatio: 1.0,
-        //     child: CustomPaint(
-        //       painter: RingPainter(
-        //         progress: (challenge.progress * 100) / challenge.targetSteps / 100,
-        //         taskCompletedColor: Colors.yellow,
-        //         taskNotCompletedColor: Colors.orange
-        //       )
-        //     ),
-        //   )
-        // )
-        
-       
+        Text("Started time: ${ChallengeUtils.formatChallengeTime(challenge.startTime)}"),
       ],
     );
   }
 
   @override
-  ChallengeCardState<ChallengeCard<Challenge>> createState() => StepsChallengeCardState();
-  
+  ChallengeCardState<ChallengeCard<Challenge>> createState() => _StepsChallengeCardState();
 }
 
-class StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
+class _StepsChallengeCardState extends ChallengeCardState<StepsChallengeCard> {
 
-  // @override
-  // void initState() {
-  //   super.initState();
+  late LocationService _locationService;
+  late StepTrackerServiceNotifier _stepTrackerService;
 
-  //   // final stepService = context.watch<StepTrackerServiceNotifier>();
-  //   // // final currentPosition = context.watch<LocationService>().currentPosition;
+  @override
+  void didChangeDependencies() {
+    _locationService = context.read<LocationService>();
+    _stepTrackerService = context.read<StepTrackerServiceNotifier>();
+    super.didChangeDependencies();
+  }
 
-  //   // stepService.addListener(_onStatusNotified);
-   
-  //   // if (stepService.currentSteps >= widget.challenge.targetSteps) {
-  //   //   widget.challenge.progress = widget.challenge.targetSteps;
-  //   //   widget.challenge.statusNotify(ChallengeStatus.completed);
-  //   //   // challenge.challengeStatusNotifier.value = ChallengeStatus.completed;
-  //   // } else {
-  //   //   widget.challenge.progress = stepService.currentSteps;
-  //   // }
-  // }
+  @override
+  void initState() {
+    super.initState();
+    widget.challenge.addListener(_onStatusNotified);
+  }
 
-  // void _onStatusNotified() {
+  void _onLocationUpdate() {
+    final location = _locationService.currentPosition;
+    if (location != null) {
+       widget.challenge.updateChallengeLocation(location.latitude, location.longitude);
+    }
+  }
 
-  //   final challengePedestrianStatus = widget.challenge.challengePedestrianStatus.value;
-  //   final timerService = context.read<TimerService>();
-
-  //   switch (challengePedestrianStatus) {
-      
-  //     case ChallengePedestrianStatus.walking:
-  //       timerService.resumeTimer(widget.challenge.id);
-  //     case ChallengePedestrianStatus.stopped:
-  //       timerService.pauseTimer();
-  //     case ChallengePedestrianStatus.unknown:
-  //       timerService.pauseTimer();
-  //   }
-  // }
+  void _onStatusNotified() {
+    if (widget.challenge.progress >= widget.challenge.targetSteps) {
+      if (widget.challenge.challengeStatus != ChallengeStatus.completed) {
+        widget.challenge.removeListener(_onStatusNotified);
+        widget.challenge.progress = widget.challenge.targetSteps;
+        completeChallenge();
+      }
+    }
+  }
 
   @override
   void startChallenge() {
     super.startChallenge();
-    context.read<StepTrackerServiceNotifier>().startTracking();
-
-    final locationService = context.read<LocationService>();
-    locationService.currentChallenge = widget.challenge;
-
-    locationService.startTracking();
+    _stepTrackerService.startTracking(widget.challenge, progress: widget.challenge.progress);
+    _locationService.startTracking();
+    _locationService.addListener(_onLocationUpdate);
   }
 
   @override
   void pauseChallenge() {
     super.pauseChallenge();
-    context.read<StepTrackerServiceNotifier>().pauseTracking();
-    context.read<LocationService>().stopTracking();
+    _stepTrackerService.pauseTracking();
+    _locationService.pauseTracking();
+    _locationService.removeListener(_onLocationUpdate);
   }
-  
-
 
   @override
   void resumeChallenge() {
     super.resumeChallenge();
-    context.read<StepTrackerServiceNotifier>().resumeTracking();
-    context.read<LocationService>().startTracking();
+    _stepTrackerService.resumeTracking(widget.challenge, progress: widget.challenge.progress);
+    _locationService.resumeTracking();
+    _locationService.addListener(_onLocationUpdate);
   }
 
   @override
   void endChallenge() {
     super.endChallenge();
-    context.read<StepTrackerServiceNotifier>().endTracking();
-    context.read<LocationService>().stopTracking();
+    _stepTrackerService.endTracking();
+    _locationService.endTracking();
+    _locationService.removeListener(_onLocationUpdate);
   }
 
   @override
   void completeChallenge() {
     super.completeChallenge();
-    context.read<StepTrackerServiceNotifier>().completeTracking();
-    context.read<LocationService>().stopTracking();
+    _stepTrackerService.completeTracking();
+    _locationService.completeTracking();
+    _locationService.removeListener(_onLocationUpdate);
+  }
+
+  @override
+  void dispose() {
+    widget.challenge.removeListener(_onStatusNotified);
+    _locationService.removeListener(_onLocationUpdate);
+    super.dispose();
   }
 }

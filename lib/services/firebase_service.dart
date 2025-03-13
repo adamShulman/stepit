@@ -1,6 +1,8 @@
 
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
 import 'package:stepit/classes/user.dart';
 
 class FirestoreService {
@@ -37,8 +39,6 @@ class FirestoreService {
     return snapshot.docs.map((doc) => User.fromMap(doc.data())).toList();
   }
 
-
-  // Add a new user
   Future<void> addUser(String name, String email) async {
     await _firestore.collection('users').add({
       'name': name,
@@ -52,32 +52,164 @@ class FirestoreService {
     return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
   }
 
-//   Future<List<Challenge>> fetchChallengesOnceFromStream() async {
-//     final snapshot = await _firestore.collection('games').snapshots().first;
-//     return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
-// }
+  Future<List<Challenge>> fetchChallengesOnceRemoveResumed(String userId) async {
 
+    final userChallengesSnapshot = await _firestore.collection('users')
+      .doc(userId.toString().padLeft(6, '0'))
+      .collection(ChallengeStatus.active.challengeFirestoreCollectionRef)
+      .get();
+    
+    // final games = gamesSnapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
+    // final userGamesIds = userGamesSnapshot.docs.map((doc) => doc['identifier']).toList();
+    // final gamesSnapshot = await _firestore.collection('games').where('identifier', isNotEqualTo: userGamesIds).get();
 
+    final userChallengesIds = userChallengesSnapshot.docs.map((doc) => doc['identifier']).toSet();
 
-//   // Fetch challenges
-//   Stream<List<Challenge>> fetchChallenges() {
-//     return _firestore.collection('games').snapshots().map((snapshot) {
-//       return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
-//     });
-//   }
+    if (userChallengesIds.isEmpty) {
+      final challengesSnapshot = await _firestore.collection('games').get();
+      return challengesSnapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
+    }
 
-  Future<List<Challenge>> fetchUserChallenges(int userId) async {
+    if (userChallengesIds.length <= 10) {
+
+      final gamesSnapshot = await _firestore
+          .collection('games')
+          .where('identifier', whereNotIn: userChallengesIds)
+          .get();
+      return gamesSnapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
+
+    } else {
+      
+      final challengesSnapshot = await _firestore.collection('games').get();
+
+      final filteredChallenges = challengesSnapshot.docs.where((doc) {
+        final identifier = doc['identifier'];
+        return !userChallengesIds.contains(identifier);
+      }).toList();
+
+      return filteredChallenges.map((doc) => Challenge.fromJson(doc.data())).toList();
+
+    }
+  }
+
+  Future<List<Challenge>> fetchUserChallenges(String userId) async {
     
     final snapshot = await _firestore.collection('users')
       .doc(userId.toString().padLeft(6, '0'))
-      .collection('userGames')
+      .collection(ChallengeStatus.active.challengeFirestoreCollectionRef)
       .get();
 
-    return snapshot.docs.map((doc) => Challenge.fromJson(doc.data())).toList();
+    return snapshot.docs.map((doc) => Challenge.fromJson(doc.data(), challengeStatus: ChallengeStatus.paused)).toList();
 
   }
 
-  // Start a challenge
+
+  void updatePointsForUser(int points, String userId) {
+
+    try {
+      
+      _firestore
+        .collection("users")
+        .doc(userId)
+        .update({'points': FieldValue.increment(points)});
+
+    } catch (error) {
+      log(error.toString());
+    }
+  }
+
+  void updateChallengeLocation(double lat, double lng, String userId, String collectionReference, int challengeId) {
+    
+    try {
+
+      final location = {
+        'latitude': lat,
+        'longitude': lng,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      _firestore.collection("users")
+        .doc(userId)
+        .collection(collectionReference)
+        .doc("game_$challengeId")
+        .collection("locations").add(location);
+
+      log("🔥 Challenge location updated in Firestore!");  
+    } catch (e) {
+      log("❌ Error updating Firestore: $e");
+    }
+  }
+
+  void updateUserChallenge(Map<String, dynamic> jsonData, String userId, String collectionReference, int challengeId) {
+
+    _firestore
+      .collection("users")
+      .doc(userId)
+      .collection(collectionReference)
+      .doc("game_$challengeId")
+      .set(jsonData, SetOptions(merge: true));
+
+  }
+
+  void removeFromFirestoreChallengeToResume(String userId, String collectionReference, int challengeId) async {
+
+    final fireStoreResumeChallengeReference = _firestore
+      .collection("users")
+      .doc(userId)
+      .collection(ChallengeStatus.active.challengeFirestoreCollectionRef)
+      .doc("game_$challengeId");
+
+      await removeFromFirestoreChallengeToResumeLocationsSubCollection(fireStoreResumeChallengeReference, userId, collectionReference, challengeId);
+
+      fireStoreResumeChallengeReference.delete();
+
+  }
+
+  Future<void> removeFromFirestoreChallengeToResumeLocationsSubCollection(DocumentReference<Map<String, dynamic>> fireStoreChallengeReference, String userId, String collectionReference, int challengeId) async {
+
+    final subCollectionRef = fireStoreChallengeReference.collection('locations');
+
+    final subDocs = await subCollectionRef.get();
+
+    for (var doc in subDocs.docs) {
+      await moveChallengeLocationsSubCollection(doc, userId, collectionReference, challengeId);
+      await doc.reference.delete();
+    }
+
+  }
+
+  Future<void> moveChallengeLocationsSubCollection(QueryDocumentSnapshot<Map<String, dynamic>> doc, String userId, String collectionReference, int challengeId) async {
+
+    final fireStoreChallengeReference = FirebaseFirestore.instance
+      .collection("users")
+      .doc(userId)
+      .collection(collectionReference)
+      .doc("game_$challengeId");
+
+      final subCollectionRef = fireStoreChallengeReference.collection('locations');
+
+      await subCollectionRef.add(doc.data());
+  }
+
+  Future<void> clearLocationsSubCollection(String userId, String collectionReference, int challengeId) async {
+
+    final collection = await _firestore
+        .collection("users")
+        .doc(userId)
+        .collection(collectionReference)
+        .doc("game_$challengeId")
+        .collection("locations").get();
+    
+    final batch = _firestore.batch();
+
+    for (final doc in collection.docs) {
+      batch.delete(doc.reference);
+    }
+    
+    return batch.commit();
+  }
+
+
   Future<void> startChallenge(String userId, String challengeId) async {
     await _firestore.collection('user_challenges').add({
       'userId': userId,
@@ -87,69 +219,10 @@ class FirestoreService {
     });
   }
 
-  // Complete a challenge
   Future<void> completeChallenge(String userChallengeId) async {
     await _firestore.collection('user_challenges').doc(userChallengeId).update({
       'status': 'completed',
       'completedAt': FieldValue.serverTimestamp(),
     });
   }
-
-  // Future<List<Game>> getTodaysGames(List<Game> allGames, User user) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? storedDate = prefs.getString('date');
-  //   String today = DateTime.now().toIso8601String().split('T')[0];
-
-  //   if (storedDate != today) {
-  //     CollectionReference userGames = FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(user.uniqueNumber.toString().padLeft(6, '0'))
-  //         .collection('userGames');
-
-  //     // Fetch the user's completed games
-  //     QuerySnapshot completedGamesSnapshot =
-  //         await userGames.where('Completed', isEqualTo: true).get();
-  //     List<String> completedGameIds =
-  //         completedGamesSnapshot.docs.map((doc) => doc.id).toList();
-
-  //     // Filter the games that have not been completed
-  //     List<Game> filteredGames = allGames
-  //         .where((game) => !completedGameIds.contains(game.id))
-  //         .toList();
-
-  //     // Shuffle and select the filtered games
-  //     filteredGames.shuffle();
-  //     List<Game> games = filteredGames.take(3).toList();
-  //     List<String> gameIds = games.map((game) => game.id).toList();
-
-  //     await prefs.setString('date', today);
-  //     await prefs.setStringList('gameIds', gameIds);
-  //     await saveTodaysGames(games, user);
-  //     return games;
-  //   } else {
-  //     List<String> storedGameIds = prefs.getStringList('gameIds') ?? [];
-  //     return allGames.where((game) => storedGameIds.contains(game.id)).toList();
-  //   }
-  // }
-// }
-
-  // Future<void> loadGames(User user) async {
-  //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-  //       .collection('games')
-  //       .where('type', isEqualTo: user.gameType)
-  //       .where('level', isEqualTo: user.level.toString())
-  //       .get();
-  //   List<DocumentSnapshot> docs = querySnapshot.docs;
-  //   List<Game>? games = [];
-  //   games = docs.map((doc) => Game.fromDocument(doc)).cast<Game>().toList();
-
-  //   // Get today's games
-  //   List<Game> todaysGames = await getTodaysGames(games, user);
-
-  //   // Save today's games to the user's collection
-  //   //await saveTodaysGames(todaysGames, user);
-
-  //   Provider.of<GameProvider>(context, listen: false).setGames(todaysGames);
-  //   notifyListeners();
-  // }
 }

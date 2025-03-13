@@ -72,49 +72,55 @@ class DurationChallengeCard extends ChallengeCard<DurationChallenge> {
 
 class _DurationChallengeCardState extends ChallengeCardState<DurationChallengeCard> {
 
+  LocationService get _locationService {
+    return context.read<LocationService>();
+  }
+
+  StepTrackerServiceNotifier get _stepTrackerService {
+    return context.read<StepTrackerServiceNotifier>();
+  }
+
+  TimerService get _timerService {
+    return context.read<TimerService>();
+  }
+
   @override
   void startChallenge() {
     super.startChallenge();
-    context.read<StepTrackerServiceNotifier>().startTracking();
-
-    final locationService = context.read<LocationService>();
-    locationService.currentChallenge = widget.challenge;
-
-    locationService.startTracking();
-
-    context.read<TimerService>().startTimer(widget.challenge.id, reset: true);
+    _stepTrackerService.startTracking(widget.challenge);
+    _locationService.startTracking();
+    _timerService.startTimer(widget.challenge.id, elapsedSeconds: widget.challenge.elapsedSeconds);
   }
 
   @override
   void pauseChallenge() {
     super.pauseChallenge();
-    context.read<StepTrackerServiceNotifier>().pauseTracking();
-    context.read<LocationService>().stopTracking();
-    context.read<TimerService>().pauseTimer();
+    _stepTrackerService.pauseTracking();
+    _locationService.pauseTracking();
+    _timerService.pauseTimer();
   }
   
   @override
   void resumeChallenge() {
     super.resumeChallenge();
-    context.read<StepTrackerServiceNotifier>().resumeTracking();
-    context.read<LocationService>().startTracking();
-    context.read<TimerService>().resumeTimer(widget.challenge.id);
+    _stepTrackerService.resumeTracking(widget.challenge);
+    _locationService.resumeTracking();
+    _timerService.resumeTimer(widget.challenge.id, elapsedSeconds: widget.challenge.elapsedSeconds);
   }
 
   @override
   void endChallenge() {
     super.endChallenge();
-    context.read<StepTrackerServiceNotifier>().endTracking();
-    context.read<LocationService>().stopTracking();
-    context.read<TimerService>().stopTimer();
+    _stepTrackerService.endTracking();
+    _locationService.endTracking();
+    _timerService.stopTimer();
   }
 
   @override
   void completeChallenge() {
     super.completeChallenge();
-    context.read<StepTrackerServiceNotifier>().completeTracking();
-    context.read<LocationService>().stopTracking();
-    context.read<TimerService>().stopTimer();
+    _stepTrackerService.completeTracking();
+    _locationService.completeTracking();
+    _timerService.stopTimer();
   }
-
 }

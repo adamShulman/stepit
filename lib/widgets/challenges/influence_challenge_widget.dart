@@ -31,45 +31,47 @@ class InfluenceChallengeCard extends ChallengeCard<InfluenceChallenge> {
 
 class _InfluenceChallengeCardState extends ChallengeCardState<InfluenceChallengeCard> {
 
+  LocationService get _locationService {
+    return context.read<LocationService>();
+  }
+
+  StepTrackerServiceNotifier get _stepTrackerService {
+    return context.read<StepTrackerServiceNotifier>();
+  }
+
   @override
   void startChallenge() {
     super.startChallenge();
-    context.read<StepTrackerServiceNotifier>().startTracking();
-
-    final locationService = context.read<LocationService>();
-    locationService.currentChallenge = widget.challenge;
-
-    locationService.startTracking();
+    _stepTrackerService.startTracking(widget.challenge);
+    _locationService.startTracking();
   }
 
   @override
   void pauseChallenge() {
     super.pauseChallenge();
-    context.read<StepTrackerServiceNotifier>().pauseTracking();
-    context.read<LocationService>().stopTracking();
+    _stepTrackerService.pauseTracking();
+    _locationService.pauseTracking();
   }
   
-
-
   @override
   void resumeChallenge() {
     super.resumeChallenge();
-    context.read<StepTrackerServiceNotifier>().resumeTracking();
-    context.read<LocationService>().startTracking();
+    _stepTrackerService.resumeTracking(widget.challenge);
+    _locationService.resumeTracking();
   }
 
   @override
   void endChallenge() {
     super.endChallenge();
-    context.read<StepTrackerServiceNotifier>().endTracking();
-    context.read<LocationService>().stopTracking();
+    _stepTrackerService.endTracking();
+    _locationService.endTracking();
   }
 
   @override
   void completeChallenge() {
     super.completeChallenge();
-    context.read<StepTrackerServiceNotifier>().completeTracking();
-    context.read<LocationService>().stopTracking();
+    _stepTrackerService.completeTracking();
+    _locationService.completeTracking();
   }
 
 }

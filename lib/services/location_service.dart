@@ -1,15 +1,14 @@
 
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:stepit/classes/abstract_challenges/challenge.dart';
 
 class LocationService extends ChangeNotifier {
 
   Position? _currentPosition;
   bool _isTracking = false;
   Timer? _timer;
-  Challenge? currentChallenge;
 
   Position? get currentPosition => _currentPosition;
   bool get isTracking => _isTracking;
@@ -29,19 +28,12 @@ class LocationService extends ChangeNotifier {
     try {
       _currentPosition = await Geolocator.getCurrentPosition();
       notifyListeners();
-      
-      // Call challenge model's Firestore method
-      currentChallenge?.updateChallengeLocation(
-        _currentPosition!.latitude,
-        _currentPosition!.longitude,
-      );
-      
     } catch (e) {
-      debugPrint("Error getting location: $e");
+      log("Error getting location: $e");
     }
   }
 
-  Future<void> startTracking({Duration interval = const Duration(seconds: 60)}) async {
+  Future<void> startTracking({Duration interval = const Duration(seconds: 180), bool isFirstTime = true}) async {
 
     final hasPermission = await _requestPermission();
 
@@ -51,16 +43,36 @@ class LocationService extends ChangeNotifier {
 
     if (_isTracking) return;
     _isTracking = true;
-    _updateLocation(); 
-    _timer = Timer.periodic(interval, (_) => _updateLocation());
-    notifyListeners();
 
+    if (isFirstTime) {
+      Future.delayed((const Duration(seconds: 1)), () {
+      _updateLocation(); 
+    });
+    }
+    
+    _timer = Timer.periodic(interval, (_) => _updateLocation());
+
+  }
+
+  void pauseTracking() {
+    stopTracking();
+  }
+
+  void resumeTracking({bool isFirstTime = false}) {
+    startTracking(isFirstTime: isFirstTime);
+  }
+
+  void completeTracking() {
+    stopTracking();
+  }
+
+  void endTracking() {
+    stopTracking();
   }
 
   void stopTracking() {
     _isTracking = false;
     _timer?.cancel();
-    // notifyListeners();
   }
 
   @override

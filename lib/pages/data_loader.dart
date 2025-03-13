@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:developer';
-
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -32,12 +32,41 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
 
   bool _isRunningTasks = false;
 
+  StreamSubscription? _subscription;
+
   @override
   void initState() {
     super.initState();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    _subscribeToNetwork();
   }
-  
+
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+  void _subscribeToNetwork() async {
+
+     _subscription?.cancel();
+
+    _subscription = InternetConnection().onStatusChange.listen(
+      (status) {
+        if (status == InternetStatus.connected && !_isRunningTasks) {
+          _userInitialization();
+        } else if (status == InternetStatus.disconnected) {
+          _showNoInternetMessage();
+        }
+      },
+      onError: (error) {
+        _showNoInternetMessage();
+      },
+    );
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -53,30 +82,14 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
                 height: 100.0,
                 width: 100.0,
               ),
-              StreamBuilder(
-                stream: InternetConnection().onStatusChange,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final status = snapshot.data!;
-                    switch (status) {
-                      case InternetStatus.connected:
-                        if(!_isRunningTasks) {
-                          _userInitialization();
-                        }
-                      case InternetStatus.disconnected:
-                        _showNoInternetMessage();
-                    }
-                  }
-                  return const SizedBox(
-                    height: 20.0,
-                    width: 20.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                      color: Colors.white,
-                    ),
-                  );
-                },
-              )
+              const SizedBox(
+                height: 20.0,
+                width: 20.0,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                  color: Colors.white,
+                ),
+              ),
             ],
           )
         ),
@@ -134,26 +147,5 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       DialogService().showSingleDialog(context, title, message);
     });
-
-    // showDialog(
-    //   context: context,
-    //   builder: (context) => AlertDialog(
-    //     title: const Text('Connectivity'),
-    //     content: Text(message),
-    //     actions: <Widget>[
-    //       TextButton(
-    //         child: const Text('OK'),
-    //         onPressed: () {
-    //           Navigator.of(context).pop();
-    //         },
-    //       ),
-    //     ],
-    //   ),
-    // );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

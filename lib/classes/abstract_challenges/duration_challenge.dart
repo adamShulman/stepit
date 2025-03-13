@@ -2,12 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 
 class DurationChallenge extends Challenge with ChangeNotifier {
   
   final int targetSteps;
   final int targetDuration;
   int progress = 0;
+  int elapsedSeconds = 0;
   
   DurationChallenge({
     required super.id,
@@ -80,6 +83,7 @@ class DurationChallenge extends Challenge with ChangeNotifier {
     super.end();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.removeFromFirestoreChallengeToResume();
   }
 
   @override 
@@ -87,11 +91,13 @@ class DurationChallenge extends Challenge with ChangeNotifier {
     super.complete();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.updatePointsForUser(getPoints());
+    super.removeFromFirestoreChallengeToResume();
   }
 
-  @override
+ @override
   bool isCompleted() {
-    return progress >= targetSteps;
+    return challengeStatus == ChallengeStatus.completed;
   }
 
   @override

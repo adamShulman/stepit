@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
-import 'package:stepit/services/step_tracker_service.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_pedestrian_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 
 class SpeedChallenge extends Challenge with ChangeNotifier {
   
@@ -22,8 +24,10 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
     required super.description,
     required super.level,
     required super.challengeType,
-    this.targetSpeed,
+    required this.progress,
     required this.targetDuration,
+    required this.elapsedSeconds,
+    this.targetSpeed,
     super.startTime,
     super.endTime,
     super.challengeStatus
@@ -41,6 +45,8 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
       targetDuration: json['target_duration'] ?? 0,
       startTime: json['start_time']?.toDate(),
       endTime: json['end_time']?.toDate(),
+      progress: json['steps'] ?? 0,
+      elapsedSeconds: json['elapsed_seconds'] ?? 0
     );
   }
 
@@ -57,6 +63,7 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
       'steps': progress,
       'target_duration': targetDuration,
       'status': challengeStatus.description,
+      'elapsed_seconds': elapsedSeconds
     };
   }
 
@@ -86,6 +93,7 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
     super.end();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.removeFromFirestoreChallengeToResume();
   }
 
   @override 
@@ -93,21 +101,32 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
     super.complete();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.updatePointsForUser(getPoints());
+    super.removeFromFirestoreChallengeToResume();
   }
 
-  @override
+ @override
   bool isCompleted() {
-    return progress >= 100;
-  }
-
-  void setPedestrianStatus(ChallengePedestrianStatus pedestrianStatus) {
-    challengePedestrianStatus.value = pedestrianStatus;
-    notifyListeners();
+    return challengeStatus == ChallengeStatus.completed;
   }
 
   @override
-  void updateChallengeLocation(double lat, double lng) {
-    super.updateChallengeLocation(lat, lng);
+  void updatePedestrianStatus(ChallengePedestrianStatus status) {
+    super.updatePedestrianStatus(status);
+    challengePedestrianStatus.value = status;
+    // notifyListeners();
+  }
+
+  // @override
+  // void updateChallengeLocation(double lat, double lng) {
+  //   super.updateChallengeLocation(lat, lng);
+  //   notifyListeners();
+  // }
+
+  @override
+  void updateProgress(int progress) {
+    super.updateProgress(progress);
+    this.progress = progress; 
     notifyListeners();
   }
 

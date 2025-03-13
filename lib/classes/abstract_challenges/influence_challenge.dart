@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 
 class InfluenceChallenge extends Challenge with ChangeNotifier {
 
@@ -84,6 +86,7 @@ class InfluenceChallenge extends Challenge with ChangeNotifier {
     super.end();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.removeFromFirestoreChallengeToResume();
   }
 
   @override 
@@ -91,11 +94,13 @@ class InfluenceChallenge extends Challenge with ChangeNotifier {
     super.complete();
     notifyListeners();
     super.updateFirebase(toJson());
+    super.updatePointsForUser(getPoints());
+    super.removeFromFirestoreChallengeToResume();
   }
 
-  @override
+ @override
   bool isCompleted() {
-    return progress >= 100;
+    return challengeStatus == ChallengeStatus.completed;
   }
 
   @override

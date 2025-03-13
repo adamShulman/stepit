@@ -1,7 +1,9 @@
 
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
+import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 import 'package:stepit/classes/abstract_challenges/distance_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/duration_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/influence_challenge.dart';
@@ -27,6 +29,12 @@ class ChallengeUtils {
       InfluenceChallenge influenceChallenge => InfluenceChallengeCard(key: key, challenge: influenceChallenge, onChallengeTap: onTap, builder: builder),
       _ => const SizedBox.shrink(), 
     };
+  }
+
+  static String? formatChallengeTime(DateTime? time) {
+    if (time == null ) { return null; }
+    DateFormat dateFormat = DateFormat("HH:mm:ss");
+    return dateFormat.format(time);
   }
 
   static IconData buttonIconDataFor(ChallengeStatus status) {
@@ -107,56 +115,18 @@ class ChallengeUtils {
     }
     return icon;
  }
-
-  static List<Widget> floatingMenuButtons(ChallengeStatus challengeStatus) {
-
-    switch (challengeStatus) {
-
-      case ChallengeStatus.inactive:
-
-        return [
-          FloatingActionButton.small(
-            shape: const CircleBorder(),
-            heroTag: null,
-            child: const Icon(Icons.play_arrow),
-            onPressed: () {
-              // Navigator.of(context).push(
-              //     MaterialPageRoute(builder: ((context) => const NextPage())));
-            },
-          ),
-          FloatingActionButton.small(
-            shape: const CircleBorder(),
-            heroTag: null,
-            child: const Icon(Icons.map),
-            onPressed: () {
-              // Navigator.of(context).push(
-              //     MaterialPageRoute(builder: ((context) => const NextPage())));
-            },
-          ),
-        ];
-
-      case ChallengeStatus.active:
-
-      case ChallengeStatus.ended:
-
-      case ChallengeStatus.completed:
-      
-      case ChallengeStatus.paused:
-        
-    }
-    return [
-      FloatingActionButton.small(
-        shape: const CircleBorder(),
-        heroTag: null,
-        child: const Icon(Icons.search),
-        onPressed: () {
-          // Navigator.of(context).push(
-          //     MaterialPageRoute(builder: ((context) => const NextPage())));
-        },
-      ),
-    ];
-  }
  
+}
+
+class DateUtils {
+
+  DateUtils._();
+
+    /// Returns the difference (in full days) between the provided date and today.
+  static int calculateDifference(DateTime date) {
+    DateTime now = DateTime.now();
+    return DateTime(date.year, date.month, date.day).difference(DateTime(now.year, now.month, now.day)).inDays;
+  }
 }
 
 class GeneralUtils {

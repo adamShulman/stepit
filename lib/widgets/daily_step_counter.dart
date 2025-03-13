@@ -19,14 +19,20 @@ class DailyStepCounterState extends State<DailyStepCounter> {
   final _healthService = HealthService();
   final _firestoreService = FirestoreService();
 
+  int get _userId {
+    return LazySingleton.instance.currentUser.uniqueNumber;
+  }
+
+  int get _userLevel {
+    return LazySingleton.instance.currentUser.level;
+  }
+
   @override
   Widget build(BuildContext context) {
      
     final now = DateTime.now();
     final formattedDate = DateFormat('EEE').format(now);
     final formattedTime = DateFormat('jm').format(now);
-
-    final userId = LazySingleton.instance.currentUser.uniqueNumber;
 
     final date = '$formattedDate, $formattedTime';
 
@@ -114,7 +120,7 @@ class DailyStepCounterState extends State<DailyStepCounter> {
                 Row(
                   children: [
                     StreamBuilder(
-                      stream: _firestoreService.getUserPointsStream(userId),
+                      stream: _firestoreService.getUserPointsStream(_userId),
                       builder: (context, snapshot) {
                         return Text(
                           snapshot.data?.toString() ?? "0",
@@ -150,12 +156,33 @@ class DailyStepCounterState extends State<DailyStepCounter> {
                     ),
                   ],
                 ),
-                const Row(
+                Row(
                   children: [
-                    Icon(
-                      Icons.bar_chart,
-                      color: Colors.blueGrey
+                    const Text(
+                      "level",
+                      style: TextStyle(
+                        color: Colors.blueGrey,
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.normal,
+                        
+                      )
                     ),
+                    const SizedBox(
+                      width: 4.0,
+                    ),
+                    Text(
+                      "$_userLevel",
+                      maxLines: 1,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                      )
+                    ),
+                    // Icon(
+                    //   Icons.bar_chart,
+                    //   color: Colors.blueGrey
+                    // ),
                   ],
                 )
               ],
@@ -165,11 +192,4 @@ class DailyStepCounterState extends State<DailyStepCounter> {
       )
     );
   }
-
-   /// Returns the difference (in full days) between the provided date and today.
-  int calculateDifference(DateTime date) {
-    DateTime now = DateTime.now();
-    return DateTime(date.year, date.month, date.day).difference(DateTime(now.year, now.month, now.day)).inDays;
-  }
-
 }

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:stepit/classes/user.dart';
 import 'package:stepit/pages/data_loader.dart';
 import 'package:stepit/services/location_service.dart';
+import 'package:stepit/services/pedestrian_status_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/services/timer_service.dart';
 
@@ -19,6 +20,7 @@ void main()  {
     providers: [
       ChangeNotifierProvider(create: (_) => LocationService()),
       // ChangeNotifierProvider(create: (context) => StepCounterProvider()),
+      ChangeNotifierProvider(create: (_) => PedestrianTrackerServiceNotifier()),
       ChangeNotifierProvider(create: (_) => StepTrackerServiceNotifier()),
       ChangeNotifierProvider(create: (_) => TimerService()),
       ChangeNotifierProvider(create: (_) => UserProvider()),
