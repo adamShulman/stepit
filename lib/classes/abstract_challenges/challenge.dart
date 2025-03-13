@@ -1,6 +1,8 @@
 
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_pedestrian_status.dart';
 import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
 import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
@@ -16,7 +18,9 @@ abstract class Challenge {
 
   final int id;
   final String name;
+  final String nameHe;
   final String description;
+  final String descriptionHe;
   final int level;
   DateTime? startTime;
   DateTime? endTime;
@@ -37,7 +41,9 @@ abstract class Challenge {
 
   Challenge({
     required this.name,
+    required this.nameHe,
     required this.description,
+    required this.descriptionHe,
     required this.startTime,
     this.endTime,
     required this.id,
@@ -72,6 +78,30 @@ abstract class Challenge {
       }
 
     return challenge;
+  }
+
+  String getLocalizedName() {
+    final locale = Platform.localeName;
+    switch (locale) {
+      case 'en_US':
+        return name;
+      case 'he_IL':
+        return nameHe;
+      default:
+        return name;
+    }
+  }
+
+  String getLocalizedDescription() {
+    final locale = Platform.localeName;
+    switch (locale) {
+      case 'en_US':
+        return description;
+      case 'he_IL':
+        return descriptionHe;
+      default:
+        return description;
+    }
   }
 
   bool isCompleted();

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
 import 'package:stepit/classes/abstract_challenges/steps_challenge.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/utils/utils.dart';
@@ -18,14 +19,14 @@ class StepsChallengeCard extends ChallengeCard<StepsChallenge> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Target Steps: ${challenge.targetSteps}"),
+        Text("${AppLocalizations.of(context)!.target}: ${challenge.targetSteps} ${AppLocalizations.of(context)!.steps}"),
         ListenableBuilder(
           listenable: challenge,
           builder: (context, child) {
-            return Text('Progress: ${challenge.progress} steps');
+            return Text('${AppLocalizations.of(context)!.progress}: ${challenge.progress} ${AppLocalizations.of(context)!.steps}');
           },
         ),
-        Text("Started time: ${ChallengeUtils.formatChallengeTime(challenge.startTime)}"),
+        Text("${AppLocalizations.of(context)!.startedTime}: ${ChallengeUtils.formatChallengeTime(challenge.startTime) ?? ""}"),
       ],
     );
   }

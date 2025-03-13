@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_confetti/flutter_confetti.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
-import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_type.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/dialog_service.dart';
 import 'package:stepit/utils/utils.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -86,8 +86,8 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
     widget.challenge.complete();
     WakelockPlus.disable();
 
-    final message = 'Congratulations! You have completed the challenge. You just received ${widget.challenge.getPoints()} points.';
-    const title = 'Challenge Completed!';
+    final message = '${AppLocalizations.of(context)!.congratulationsMessage} ${widget.challenge.getPoints()} ${AppLocalizations.of(context)!.points}.';
+    final title = '${AppLocalizations.of(context)!.challengeCompleted}!';
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       Confetti.launch(
@@ -155,7 +155,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
                 children: [
                   Flexible(
                     child: Text(
-                      widget.challenge.name, 
+                      widget.challenge.getLocalizedName(), 
                       style: const TextStyle(
                         fontSize: 17.0, 
                         fontWeight: FontWeight.bold
@@ -171,7 +171,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
               ),
               const SizedBox(height: 8.0),
               Text(
-                widget.challenge.description, 
+                widget.challenge.getLocalizedDescription(), 
                 style: const TextStyle(
                   fontSize: 14.0, 
                   color: Colors.grey
@@ -179,7 +179,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
               ),
               const SizedBox(height: 8.0),
               Text(
-                "Challenge type: ${widget.challenge.challengeType.description}", 
+                "${AppLocalizations.of(context)!.challengeType}: ${ChallengeUtils.getLocalizedChallengeType(widget.challenge.challengeType, context)}", 
                 style: const TextStyle(
                   fontSize: 14.0,
                   fontWeight: FontWeight.w500
@@ -192,7 +192,7 @@ abstract class ChallengeCardState<T extends ChallengeCard> extends State<T> {
                 valueListenable: widget.challenge.challengeStatusNotifier,
                 builder: (context, value, child) {
                   return Text(
-                    "Status: ${value.description}",
+                    "${AppLocalizations.of(context)!.status}: ${ChallengeUtils.getLocalizedChallengeStatus(value, context)}",
                     style: const TextStyle(
                       fontSize: 14.0,
                       color: Colors.black

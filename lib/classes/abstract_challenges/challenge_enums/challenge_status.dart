@@ -26,23 +26,6 @@ extension ChallengeStatusExtension on ChallengeStatus {
   }
 }
 
-extension ChallengeStatusActionButtonTitleExtension on ChallengeStatus {
-  String get challengeButtonTitle {
-    switch (this) {
-      case ChallengeStatus.inactive:
-        return "Start challenge";
-      case ChallengeStatus.active:
-        return "Pause challenge";
-      case ChallengeStatus.ended:
-        return "Challenge ended";
-      case ChallengeStatus.completed:
-        return "Challenge completed";
-      case ChallengeStatus.paused:
-        return "Resume challenge";
-    }
-  }
-}
-
 extension ChallengeStatusFirestoreCollectionRef on ChallengeStatus {
   String get challengeFirestoreCollectionRef {
     switch (this) {

@@ -95,12 +95,6 @@ abstract class AppLocalizations {
     Locale('he')
   ];
 
-  /// No description provided for @helloWorld.
-  ///
-  /// In en, this message translates to:
-  /// **'Hello World!'**
-  String get helloWorld;
-
   /// No description provided for @chooseChallengeTitle.
   ///
   /// In en, this message translates to:
@@ -143,11 +137,29 @@ abstract class AppLocalizations {
   /// **'End challenge'**
   String get endChallenge;
 
+  /// No description provided for @endChallengeConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to end the challenge? All progress will be erased.'**
+  String get endChallengeConfirmation;
+
   /// No description provided for @resumeChallenge.
   ///
   /// In en, this message translates to:
   /// **'Resume challenge'**
   String get resumeChallenge;
+
+  /// No description provided for @challengeCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge completed'**
+  String get challengeCompleted;
+
+  /// No description provided for @challengeEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge ended'**
+  String get challengeEnded;
 
   /// No description provided for @overviewTitle.
   ///
@@ -256,6 +268,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
+
+  /// No description provided for @internetConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Connectivity'**
+  String get internetConnection;
+
+  /// No description provided for @checkConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your internet connection and try again.'**
+  String get checkConnection;
+
+  /// No description provided for @getChallengesError.
+  ///
+  /// In en, this message translates to:
+  /// **'There was an error getting challenges.'**
+  String get getChallengesError;
+
+  /// No description provided for @noChallengesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No challenges found'**
+  String get noChallengesFound;
+
+  /// No description provided for @anotherChallengeInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Another challenge in progress'**
+  String get anotherChallengeInProgress;
+
+  /// No description provided for @toggleMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle map'**
+  String get toggleMap;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @congratulationsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations! You have completed the challenge. You just received'**
+  String get congratulationsMessage;
+
+  /// No description provided for @challengeType.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge type'**
+  String get challengeType;
+
+  /// No description provided for @challengeTypeSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps'**
+  String get challengeTypeSteps;
+
+  /// No description provided for @challengeTypeSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get challengeTypeSpeed;
+
+  /// No description provided for @challengeTypeDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get challengeTypeDuration;
+
+  /// No description provided for @challengeTypeDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get challengeTypeDistance;
+
+  /// No description provided for @challengeTypeInfluence.
+  ///
+  /// In en, this message translates to:
+  /// **'Influence'**
+  String get challengeTypeInfluence;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @target.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get target;
+
+  /// No description provided for @progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get progress;
+
+  /// No description provided for @km.
+  ///
+  /// In en, this message translates to:
+  /// **'km'**
+  String get km;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes;
+
+  /// No description provided for @seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'seconds'**
+  String get seconds;
+
+  /// No description provided for @elapsedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Elapsed Time'**
+  String get elapsedTime;
+
+  /// No description provided for @pedestrianStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Pedestrian status'**
+  String get pedestrianStatus;
+
+  /// No description provided for @startedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Started time'**
+  String get startedTime;
+
+  /// No description provided for @photos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photos;
+
+  /// No description provided for @photosTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos Taken'**
+  String get photosTaken;
+
+  /// No description provided for @stepsTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps taken'**
+  String get stepsTaken;
+
+  /// No description provided for @inactiveStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'inactive'**
+  String get inactiveStatus;
+
+  /// No description provided for @activeStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'active'**
+  String get activeStatus;
+
+  /// No description provided for @pausedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'paused'**
+  String get pausedStatus;
+
+  /// No description provided for @endedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'ended'**
+  String get endedStatus;
+
+  /// No description provided for @completedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'completed'**
+  String get completedStatus;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

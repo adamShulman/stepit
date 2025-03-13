@@ -1,9 +1,12 @@
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_status.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/dialog_service.dart';
 import 'package:stepit/utils/utils.dart';
 import 'package:stepit/widgets/app_bar.dart';
@@ -50,13 +53,15 @@ class _ChallengePageState extends State<ChallengePage> {
 
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       // backgroundColor: Colors.transparent,
-      appBar: const StepItAppBar(
-        title: 'Overview',
+      appBar: StepItAppBar(
+        title: AppLocalizations.of(context)!.overviewTitle,
       ),
       body: BackgroundGradientContainer(
         child: Column(
@@ -88,8 +93,8 @@ class _ChallengePageState extends State<ChallengePage> {
                 builder: (context, value, child) {
                   return ChallengeButton(
                     text: _isAnotherChallengeInProgress
-                      ? 'Another challenge in progress' 
-                      : value.challengeButtonTitle,
+                      ? AppLocalizations.of(context)!.anotherChallengeInProgress 
+                      : ChallengeUtils.getLocalizedChallengeStatusButtonTitle(value, context),
                     icon: _isAnotherChallengeInProgress 
                       ? Icons.info
                       : ChallengeUtils.buttonIconDataFor(value),
@@ -174,23 +179,23 @@ class _ChallengePageState extends State<ChallengePage> {
                   shape: const CircleBorder(),
                 ),
                 onOpen: () {
-                  debugPrint('onOpen');
+                  log('onOpen');
                 },
                 afterOpen: () {
-                  debugPrint('afterOpen');
+                  log('afterOpen');
                 },
                 onClose: () {
-                  debugPrint('onClose');
+                  log('onClose');
                 },
                 afterClose: () {
-                  debugPrint('afterClose');
+                  log('afterClose');
                 },
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        'End challenge',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.endChallenge,
+                        style: const TextStyle(
                           fontSize: 14.0,
                           fontWeight: FontWeight.bold
                         ),
@@ -204,12 +209,12 @@ class _ChallengePageState extends State<ChallengePage> {
                         onPressed: () {
                           final state = _key.currentState;
                           if (state != null) {
-                            debugPrint('isOpen:${state.isOpen}');
                             state.toggle();
                           }
                           DialogService().showSingleDialogToEndChallenge(
-                            context, 'End challenge', 
-                            'Are you sure you want to end the challenge? All progress will be erased.', 
+                            context, 
+                            AppLocalizations.of(context)!.endChallenge, 
+                            AppLocalizations.of(context)!.endChallengeConfirmation, 
                             onCancel: () => (),
                             onEnd: () => widget.challenge.end(),
                           );
@@ -220,9 +225,9 @@ class _ChallengePageState extends State<ChallengePage> {
                   ),
                   Row(
                     children: [
-                      const Text(
-                        'Toggle map',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.toggleMap,
+                        style: const TextStyle(
                           fontSize: 14.0,
                           fontWeight: FontWeight.bold
                         ),
@@ -236,7 +241,6 @@ class _ChallengePageState extends State<ChallengePage> {
                         onPressed: () {
                           final state = _key.currentState;
                           if (state != null) {
-                            debugPrint('isOpen:${state.isOpen}');
                             state.toggle();
                           }
                           setState(() {
@@ -248,9 +252,7 @@ class _ChallengePageState extends State<ChallengePage> {
                       ),
                     ],
                   )
-                  
                 ]
-                
               );
             default:
               return const SizedBox.shrink();

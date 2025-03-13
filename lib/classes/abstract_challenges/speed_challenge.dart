@@ -21,7 +21,9 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
   SpeedChallenge({
     required super.id,
     required super.name,
+    required super.nameHe,
     required super.description,
+    required super.descriptionHe,
     required super.level,
     required super.challengeType,
     required this.progress,
@@ -37,10 +39,12 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
   factory SpeedChallenge.fromJson(Map<String, dynamic> json) {
     return SpeedChallenge(
       id: json['identifier'],
-      name: json['title'],
-      description: json['description'],
+      name: json['title'] ?? '',
+      nameHe: json['title_he'] ?? '',
+      description: json['description'] ?? '',
+      descriptionHe: json['description_he'] ?? '',
       level: json['level'] ?? 1,
-      challengeType: ChallengeType.fromValue(json['type']),
+      challengeType: json['type'] != null ? ChallengeType.fromValue(json['type']) : ChallengeType.steps,
       challengeStatus: json['status'] != null ? ChallengeStatus.fromString(json['status']) : ChallengeStatus.inactive,
       targetDuration: json['target_duration'] ?? 0,
       startTime: json['start_time']?.toDate(),
@@ -55,6 +59,8 @@ class SpeedChallenge extends Challenge with ChangeNotifier {
     return {
       'identifier': id,
       'title': name,
+      'title_he': nameHe,
+      'description_he': descriptionHe,
       'type': challengeType.value,
       'description': description,
       'completed': isCompleted(),

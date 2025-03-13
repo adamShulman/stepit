@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/challenge_enums/challenge_pedestrian_status.dart';
 import 'package:stepit/classes/abstract_challenges/speed_challenge.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/pedestrian_status_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
@@ -24,12 +25,12 @@ class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Target: ${challenge.targetDuration} min"),
+        Text("${AppLocalizations.of(context)!.target}: ${challenge.targetDuration} ${AppLocalizations.of(context)!.minutes}"),
         // Text("Progress: ${challenge.progress} min"),
         ValueListenableBuilder(
           valueListenable: challenge.challengePedestrianStatus,
           builder: (context, value, child) {
-            return Text("Pedestrian status: ${challenge.challengePedestrianStatus.value.description}"); 
+            return Text("${AppLocalizations.of(context)!.pedestrianStatus}: ${challenge.challengePedestrianStatus.value.description}"); 
           },
         ),
         // challenge.challengeStatus == ChallengeStatus.active 
@@ -47,7 +48,7 @@ class SpeedChallengeCard extends ChallengeCard<SpeedChallenge> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Elapsed Time: ${timerService.elapsedSeconds} seconds'
+                      '${AppLocalizations.of(context)!.elapsedTime}: ${timerService.elapsedSeconds} ${AppLocalizations.of(context)!.seconds}'
                     ),
                     // const SizedBox(height: 20),
                     // Row(

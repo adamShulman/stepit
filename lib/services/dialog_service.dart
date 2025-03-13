@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 
 class DialogService {
 
@@ -47,7 +48,7 @@ class DialogService {
               Navigator.of(context).pop();
               onCancel();
             },
-            child: const Text("Cancel"),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -55,7 +56,7 @@ class DialogService {
               Navigator.of(context).pop();
               onEnd();
             },
-            child: const Text("End challenge"),
+            child: Text(AppLocalizations.of(context)!.endChallenge),
           ),
         ],
       ),

@@ -16,7 +16,9 @@ class InfluenceChallenge extends Challenge with ChangeNotifier {
   InfluenceChallenge({
     required super.id,
     required super.name,
+    required super.nameHe,
     required super.description,
+    required super.descriptionHe,
     required super.level,
     required super.challengeType,
     required this.requiredPhotos,
@@ -29,10 +31,12 @@ class InfluenceChallenge extends Challenge with ChangeNotifier {
   factory InfluenceChallenge.fromJson(Map<String, dynamic> json) {
     return InfluenceChallenge(
       id: json['identifier'],
-      name: json['title'],
-      description: json['description'],
-      level: json['level'],
-      challengeType: ChallengeType.fromValue(json['type']), 
+      name: json['title'] ?? '',
+      nameHe: json['title_he'] ?? '',
+      description: json['description'] ?? '',
+      descriptionHe: json['description_he'] ?? '',
+      level: json['level'] ?? 1,
+      challengeType: json['type'] != null ? ChallengeType.fromValue(json['type']) : ChallengeType.steps,
       requiredPhotos: null, 
       stepLimit: null,
       startTime: json['start_time']?.toDate(),
@@ -45,6 +49,8 @@ class InfluenceChallenge extends Challenge with ChangeNotifier {
     return {
       'identifier': id,
       'title': name,
+      'title_he': nameHe,
+      'description_he': descriptionHe,
       'type': challengeType.value,
       'description': description,
       'completed': isCompleted(),

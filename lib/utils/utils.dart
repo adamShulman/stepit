@@ -9,6 +9,7 @@ import 'package:stepit/classes/abstract_challenges/duration_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/influence_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/speed_challenge.dart';
 import 'package:stepit/classes/abstract_challenges/steps_challenge.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/widgets/challenge_card.dart';
 import 'package:stepit/widgets/challenges/distance_challenge_widget.dart';
 import 'package:stepit/widgets/challenges/duration_challenge_widget.dart';
@@ -115,6 +116,52 @@ class ChallengeUtils {
     }
     return icon;
  }
+
+ static String getLocalizedChallengeStatus(ChallengeStatus status, BuildContext context) {
+    switch (status) {
+      case ChallengeStatus.inactive:
+        return AppLocalizations.of(context)!.inactiveStatus;
+      case ChallengeStatus.active:
+        return AppLocalizations.of(context)!.activeStatus;
+      case ChallengeStatus.ended:
+        return AppLocalizations.of(context)!.endedStatus;
+      case ChallengeStatus.completed:
+        return AppLocalizations.of(context)!.completedStatus;
+      case ChallengeStatus.paused:
+        return AppLocalizations.of(context)!.pausedStatus;
+    }
+  }
+
+ static String getLocalizedChallengeStatusButtonTitle(ChallengeStatus status, BuildContext context) {
+    switch (status) {
+      case ChallengeStatus.inactive:
+        return AppLocalizations.of(context)!.startChallenge;
+      case ChallengeStatus.active:
+        return AppLocalizations.of(context)!.pauseChallenge;
+      case ChallengeStatus.ended:
+        return AppLocalizations.of(context)!.challengeEnded;
+      case ChallengeStatus.completed:
+        return AppLocalizations.of(context)!.challengeCompleted;
+      case ChallengeStatus.paused:
+        return AppLocalizations.of(context)!.resumeChallenge;
+    }
+  }
+
+  static String getLocalizedChallengeType(ChallengeType type, BuildContext context) {
+    switch (type) {
+
+      case ChallengeType.steps:
+        return AppLocalizations.of(context)!.challengeTypeSteps;
+      case ChallengeType.speed:
+        return AppLocalizations.of(context)!.challengeTypeSpeed;
+      case ChallengeType.distance:
+        return AppLocalizations.of(context)!.challengeTypeDistance;
+      case ChallengeType.duration:
+        return AppLocalizations.of(context)!.challengeTypeDuration;
+      case ChallengeType.influence:
+        return AppLocalizations.of(context)!.challengeTypeInfluence;
+    }
+  }
  
 }
 

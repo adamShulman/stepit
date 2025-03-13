@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       // backgroundColor: Colors.transparent,
       // extendBody: true,
       appBar: StepItAppBar(
-        title: AppLocalizations.of(context)!.helloWorld,
+        title: AppLocalizations.of(context)!.chooseChallengeTitle,
       ),
       body: BackgroundGradientContainer(
         child: SingleChildScrollView(
@@ -109,11 +109,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     return Column(
                       // crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const FittedBox(
+                        FittedBox(
                           child: Text(
-                            'Resume challenge',
+                            AppLocalizations.of(context)!.resumeChallenge,
                             textAlign: TextAlign.left,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
@@ -163,18 +163,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                     );
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(child: Text(AppLocalizations.of(context)!.getChallengesError));
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final challenges = snapshot.data!;
                     // _challenges = challenges;
 
                     return Column(
                       children: [
-                        const FittedBox(
+                        FittedBox(
                           child: Text(
-                            'New challenge',
+                            AppLocalizations.of(context)!.newChallenge,
                             textAlign: TextAlign.left,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
@@ -206,8 +206,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ],
                     );
                   } else {
-                    return const Center(
-                      child: Text('No challenges found'),
+                    return Center(
+                      child: Text(AppLocalizations.of(context)!.noChallengesFound),
                     );
                   }
                 },

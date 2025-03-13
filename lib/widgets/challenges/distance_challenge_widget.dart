@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/distance_challenge.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
@@ -17,8 +18,8 @@ class DistanceChallengeCard extends ChallengeCard<DistanceChallenge> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Target: ${challenge.targetDistance} km"),
-        Text("Progress: ${challenge.progress} km"),
+        Text("${AppLocalizations.of(context)!.target}: ${challenge.targetDistance} ${AppLocalizations.of(context)!.km}"),
+        Text("${AppLocalizations.of(context)!.progress}: ${challenge.progress} ${AppLocalizations.of(context)!.km}"),
       ],
     );
   }

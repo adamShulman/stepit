@@ -1,84 +1,184 @@
 {
   "@@locale": "he",
 
-  "helloWorld": "Hello World!",
-  "@helloWorld": {},
-
-  "chooseChallengeTitle": "Choose a challenge",
+  "chooseChallengeTitle": "בחירת אתגר",
   "@chooseChallengeTitle": {},
 
-  "newChallenge": "New challenge",
+  "newChallenge": "אתגר חדש",
   "@newChallenge": {},
 
-  "completedChallenges": "Completed challenges",
+  "completedChallenges": "אתגרים שסיימתי בהצלחה",
   "@completedChallenges": {},
 
-  "startChallenge": "Start challenge",
+  "startChallenge": "התחלת אתגר",
   "@startChallenge": {},
 
-  "pauseChallenge": "Pause challenge",
+  "pauseChallenge": "הפסקת אתגר",
   "@pauseChallenge": {},
 
-  "stopChallenge": "Stop challenge",
+  "stopChallenge": "עצירת אתגר",
   "@stopChallenge": {},
 
-  "endChallenge": "End challenge",
+  "endChallenge": "סיום אתגר",
   "@endChallenge": {},
 
-  "resumeChallenge": "Resume challenge",
+  "endChallengeConfirmation": "האם לסיים את האתגר? כל ההתקדמות תמחק.",
+  "@endChallengeConfirmation": {},
+  
+  "resumeChallenge": "המשך אתגר",
   "@resumeChallenge": {},
 
-  "overviewTitle": "Overview",
+  "challengeCompleted": "אתגר נגמר בהצלחה",
+  "@challengeCompleted": {},
+
+  "challengeEnded": "אתגר נגמר",
+  "@challengeEnded": {},
+
+  "overviewTitle": "סקירה כללית",
   "@overviewTitle": {},
 
-  "steps": "steps",
+  "steps": "צעדים",
   "@steps": {},
 
-  "points": "points",
+  "points": "נקודות",
   "@points": {},
 
-  "level": "level",
+  "level": "שלב",
   "@level": {},
 
-  "termsTitle": "Terms And Conditions",
+  "termsTitle": "תקנון ותנאים",
   "@termsTitle": {},
 
-  "welcomeTo": "Welcome to Stepit",
+  "welcomeTo": "ברוכים הבאים",
   "@welcomeTo": {},
 
-  "agreeToTerms": "I agree to the terms and conditions.",
+  "agreeToTerms": "אני מסכים לתנאים ולתקנון.",
   "@agreeToTerms": {},
 
-  "next": "Next",
+  "next": "הבא",
   "@next": {},
 
-  "ok": "ok",
+  "ok": "אוקי",
   "@ok": {},
 
-  "termsBeforeProceed": "Before you proceed, you must agree to our terms of service.",
+  "termsBeforeProceed": "לפני שנמשיך, עליך להסכים לתנאי השירות.",
   "@termsBeforeProceed": {},
 
-  "identificationTitle": "Identification",
+  "identificationTitle": "הזדהות",
   "@identificationTitle": {},
 
-  "uniqueNumberGetError": "There was an error getting unique number.",
+  "uniqueNumberGetError": "אירעה שגיאה בהשגת מספר ייחודי.",
   "@uniqueNumberGetError": {},
 
-  "userNameRegexMessage": "Username must contain only letters and numbers, and it must be between 4 and 16 characters long",
+  "userNameRegexMessage": "שם המשתמש חייב להכיל רק אותיות ומספרים, והוא חייב להיות באורך של בין 4 ל-16 תווים",
   "@userNameRegexMessage": {},
 
-  "enterUserName": "Enter a username to get started",
+  "enterUserName": "הזן שם משתמש כדי להתחיל",
   "@enterUserName": {},
 
-  "loadingUniqueNumber": "Unique number: loading...",
+  "loadingUniqueNumber": "מספר ייחודי: טוען...",
   "@loadingUniqueNumber": {},
 
-  "uniqueNumber": "Unique number:",
+  "uniqueNumber": "מספר ייחודי:",
   "@uniqueNumber": {},
 
-  "uniqueNumberNotFound": "Unique number: not found",
+  "uniqueNumberNotFound": "מספר ייחודי: לא נמצא",
   "@uniqueNumberNotFound": {},
+
+  "done": "בוצע",
+  "@done": {},
+
+  "internetConnection": "קישוריות",
+  "@internetConnection": {},
+
+  "checkConnection": "בדוק את חיבור האינטרנט שלך ונסה שוב.",
+  "@checkConnection": {},
+
+  "getChallengesError": "אירעה שגיאה בקבלת אתגרים.",
+  "@getChallengesError": {},
+
+  "noChallengesFound": "לא נמצאו אתגרים",
+  "@noChallengesFound": {},
+
+  "anotherChallengeInProgress": "עוד אתגר בתהליך",
+  "@anotherChallengeInProgress": {},
+
+  "toggleMap": "הצג/הסר מפה",
+  "@toggleMap": {},
+
+  "cancel": "ביטול",
+  "@cancel": {},
+
+  "congratulationsMessage": "מזל טוב! השלמת את האתגר. הרגע קיבלת",
+  "@congratulationsMessage": {},
+
+  "challengeType": "סוג אתגר",
+  "@challengeType": {},
   
-  "done": "Done",
-  "@done": {}
+  "challengeTypeSteps": "צעדים",
+  "@challengeTypeSteps": {},
+
+  "challengeTypeSpeed": "מהירות",
+  "@challengeTypeSpeed": {},
+
+  "challengeTypeDuration": "משך זמן",
+  "@challengeTypeDuration": {},
+
+  "challengeTypeDistance": "מרחק",
+  "@challengeTypeDistance": {},
+
+  "challengeTypeInfluence": "השפעה",
+  "@challengeTypeInfluence": {},
+
+  "status": "סטאטוס",
+  "@status": {},
+
+  "target": "מטרה",
+  "@target": {},
+
+  "progress": "התקדמות",
+  "@progress": {},
+
+  "km": "ק׳׳מ",
+  "@km": {},
+  
+  "minutes": "דקות",
+  "@minutes": {},
+  
+  "seconds": "שניות",
+  "@seconds": {},
+  
+  "elapsedTime": "זמן שעבר",
+  "@elapsedTime": {},
+  
+  "pedestrianStatus": "סטאטוס הולך רגל",
+  "@pedestrianStatus": {},
+
+  "startedTime": "זמן התחלה",
+  "@startedTime": {},
+
+  "photos": "תמונות",
+  "@photos": {},
+
+  "photosTaken": "תמונות שנלקחו",
+  "@photosTaken": {},
+
+  "stepsTaken": "צעדים שנלקחו",
+  "@stepsTaken": {},
+
+  "inactiveStatus": "לא פעיל",
+  "@inactiveStatus": {},
+
+  "activeStatus": "פעיל",
+  "@activeStatus": {},
+
+  "pausedStatus": "הושהה",
+  "@pausedStatus": {},
+
+  "endedStatus": "הסתיים",
+  "@endedStatus": {},
+
+  "completedStatus": "הסתיים בהצלחה",
+  "@completedStatus": {}
+  
 }

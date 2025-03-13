@@ -9,9 +9,6 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get helloWorld => 'Hello World!';
-
-  @override
   String get chooseChallengeTitle => 'Choose a challenge';
 
   @override
@@ -33,7 +30,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endChallenge => 'End challenge';
 
   @override
+  String get endChallengeConfirmation => 'Are you sure you want to end the challenge? All progress will be erased.';
+
+  @override
   String get resumeChallenge => 'Resume challenge';
+
+  @override
+  String get challengeCompleted => 'Challenge completed';
+
+  @override
+  String get challengeEnded => 'Challenge ended';
 
   @override
   String get overviewTitle => 'Overview';
@@ -88,4 +94,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get done => 'Done';
+
+  @override
+  String get internetConnection => 'Connectivity';
+
+  @override
+  String get checkConnection => 'Check your internet connection and try again.';
+
+  @override
+  String get getChallengesError => 'There was an error getting challenges.';
+
+  @override
+  String get noChallengesFound => 'No challenges found';
+
+  @override
+  String get anotherChallengeInProgress => 'Another challenge in progress';
+
+  @override
+  String get toggleMap => 'Toggle map';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get congratulationsMessage => 'Congratulations! You have completed the challenge. You just received';
+
+  @override
+  String get challengeType => 'Challenge type';
+
+  @override
+  String get challengeTypeSteps => 'Steps';
+
+  @override
+  String get challengeTypeSpeed => 'Speed';
+
+  @override
+  String get challengeTypeDuration => 'Duration';
+
+  @override
+  String get challengeTypeDistance => 'Distance';
+
+  @override
+  String get challengeTypeInfluence => 'Influence';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get target => 'Target';
+
+  @override
+  String get progress => 'Progress';
+
+  @override
+  String get km => 'km';
+
+  @override
+  String get minutes => 'minutes';
+
+  @override
+  String get seconds => 'seconds';
+
+  @override
+  String get elapsedTime => 'Elapsed Time';
+
+  @override
+  String get pedestrianStatus => 'Pedestrian status';
+
+  @override
+  String get startedTime => 'Started time';
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get photosTaken => 'Photos Taken';
+
+  @override
+  String get stepsTaken => 'Steps taken';
+
+  @override
+  String get inactiveStatus => 'inactive';
+
+  @override
+  String get activeStatus => 'active';
+
+  @override
+  String get pausedStatus => 'paused';
+
+  @override
+  String get endedStatus => 'ended';
+
+  @override
+  String get completedStatus => 'completed';
 }

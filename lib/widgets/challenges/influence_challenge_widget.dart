@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/influence_challenge.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/widgets/challenge_card.dart';
@@ -17,10 +18,9 @@ class InfluenceChallengeCard extends ChallengeCard<InfluenceChallenge> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Required Photos: ${challenge.requiredPhotos}"),
-        Text("Photos Taken: ${challenge.photosTaken}"),
-        Text("Step Limit: ${challenge.stepLimit}"),
-        Text("Steps Used: ${challenge.progress}"),
+        Text("${AppLocalizations.of(context)!.target}: ${challenge.requiredPhotos ?? 0} ${AppLocalizations.of(context)!.photos}"),
+        Text("${AppLocalizations.of(context)!.photosTaken}: ${challenge.photosTaken}"),
+        Text("${AppLocalizations.of(context)!.stepsTaken}: ${challenge.progress}"),
       ],
     );
   }

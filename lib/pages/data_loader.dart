@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
 import 'package:stepit/classes/user.dart';
 import 'package:stepit/firebase_options.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/pages/identification.dart';
 import 'package:stepit/pages/agreement.dart';
 import 'package:stepit/pages/homepage.dart';
@@ -141,8 +142,8 @@ class _DataLoaderPageState extends State<DataLoaderPage> {
 
   void _showNoInternetMessage() {
 
-    const title = 'Connectivity';
-    const message = 'Check your internet connection and try again.';
+    final title = AppLocalizations.of(context)!.internetConnection;
+    final message = AppLocalizations.of(context)!.checkConnection;
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       DialogService().showSingleDialog(context, title, message);

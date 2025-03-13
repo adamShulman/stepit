@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/firebase_service.dart';
 import 'package:stepit/services/health_service.dart';
 
@@ -31,10 +32,10 @@ class DailyStepCounterState extends State<DailyStepCounter> {
   Widget build(BuildContext context) {
      
     final now = DateTime.now();
-    final formattedDate = DateFormat('EEE').format(now);
-    final formattedTime = DateFormat('jm').format(now);
+    final formattedDate = DateFormat.EEEE(Localizations.localeOf(context).toString()).format(now);
+    final formattedTime = DateFormat.jm(Localizations.localeOf(context).toString()).format(now);
 
-    final date = '$formattedDate, $formattedTime';
+    final date = '$formattedTime, $formattedDate';
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -73,9 +74,9 @@ class DailyStepCounterState extends State<DailyStepCounter> {
                     const SizedBox(
                       width: 4.0,
                     ),
-                    const Text(
-                      "steps",
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.steps,
+                      style: const TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 13.0,
                         fontWeight: FontWeight.normal,
@@ -145,9 +146,9 @@ class DailyStepCounterState extends State<DailyStepCounter> {
                     const SizedBox(
                       width: 4.0,
                     ),
-                    const Text(
-                      "points",
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.points,
+                      style: const TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 13.0,
                         fontWeight: FontWeight.normal,
@@ -158,9 +159,9 @@ class DailyStepCounterState extends State<DailyStepCounter> {
                 ),
                 Row(
                   children: [
-                    const Text(
-                      "level",
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.level,
+                      style: const TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 13.0,
                         fontWeight: FontWeight.normal,

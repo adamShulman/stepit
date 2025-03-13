@@ -1,9 +1,6 @@
 {
   "@@locale": "en",
 
-  "helloWorld": "Hello World!",
-  "@helloWorld": {},
-
   "chooseChallengeTitle": "Choose a challenge",
   "@chooseChallengeTitle": {},
 
@@ -25,8 +22,17 @@
   "endChallenge": "End challenge",
   "@endChallenge": {},
 
+  "endChallengeConfirmation": "Are you sure you want to end the challenge? All progress will be erased.",
+  "@endChallengeConfirmation": {},
+  
   "resumeChallenge": "Resume challenge",
   "@resumeChallenge": {},
+
+  "challengeCompleted": "Challenge completed",
+  "@challengeCompleted": {},
+
+  "challengeEnded": "Challenge ended",
+  "@challengeEnded": {},
 
   "overviewTitle": "Overview",
   "@overviewTitle": {},
@@ -78,8 +84,101 @@
 
   "uniqueNumberNotFound": "Unique number: not found",
   "@uniqueNumberNotFound": {},
-  
+
   "done": "Done",
-  "@done": {}
+  "@done": {},
+
+  "internetConnection": "Connectivity",
+  "@internetConnection": {},
+
+  "checkConnection": "Check your internet connection and try again.",
+  "@checkConnection": {},
+
+  "getChallengesError": "There was an error getting challenges.",
+  "@getChallengesError": {},
+
+  "noChallengesFound": "No challenges found",
+  "@noChallengesFound": {},
+
+  "anotherChallengeInProgress": "Another challenge in progress",
+  "@anotherChallengeInProgress": {},
+
+  "toggleMap": "Toggle map",
+  "@toggleMap": {},
+
+  "cancel": "Cancel",
+  "@cancel": {},
+
+  "congratulationsMessage": "Congratulations! You have completed the challenge. You just received",
+  "@congratulationsMessage": {},
+
+  "challengeType": "Challenge type",
+  "@challengeType": {},
+  
+  "challengeTypeSteps": "Steps",
+  "@challengeTypeSteps": {},
+
+  "challengeTypeSpeed": "Speed",
+  "@challengeTypeSpeed": {},
+
+  "challengeTypeDuration": "Duration",
+  "@challengeTypeDuration": {},
+
+  "challengeTypeDistance": "Distance",
+  "@challengeTypeDistance": {},
+
+  "challengeTypeInfluence": "Influence",
+  "@challengeTypeInfluence": {},
+
+  "status": "Status",
+  "@status": {},
+
+  "target": "Target",
+  "@target": {},
+
+  "progress": "Progress",
+  "@progress": {},
+
+  "km": "km",
+  "@km": {},
+  
+  "minutes": "minutes",
+  "@minutes": {},
+  
+  "seconds": "seconds",
+  "@seconds": {},
+  
+  "elapsedTime": "Elapsed Time",
+  "@elapsedTime": {},
+  
+  "pedestrianStatus": "Pedestrian status",
+  "@pedestrianStatus": {},
+
+  "startedTime": "Started time",
+  "@startedTime": {},
+
+  "photos": "Photos",
+  "@photos": {},
+
+  "photosTaken": "Photos Taken",
+  "@photosTaken": {},
+
+  "stepsTaken": "Steps taken",
+  "@stepsTaken": {},
+
+  "inactiveStatus": "inactive",
+  "@inactiveStatus": {},
+
+  "activeStatus": "active",
+  "@activeStatus": {},
+
+  "pausedStatus": "paused",
+  "@pausedStatus": {},
+
+  "endedStatus": "ended",
+  "@endedStatus": {},
+
+  "completedStatus": "completed",
+  "@completedStatus": {}
 
 }

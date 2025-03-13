@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/abstract_challenges/duration_challenge.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/services/timer_service.dart';
@@ -18,8 +19,8 @@ class DurationChallengeCard extends ChallengeCard<DurationChallenge> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Target steps: ${challenge.targetSteps}"),
-        Text("Target duration: ${challenge.targetDuration} minutes"),
+        Text("${AppLocalizations.of(context)!.target}: ${challenge.targetSteps} ${AppLocalizations.of(context)!.steps}"),
+        Text("${AppLocalizations.of(context)!.target}: ${challenge.targetDuration} ${AppLocalizations.of(context)!.minutes}"),
         // Text("Progress: ${challenge.progress} steps"),
         
         Builder(
@@ -31,7 +32,7 @@ class DurationChallengeCard extends ChallengeCard<DurationChallenge> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Elapsed Time: ${timerService.elapsedSeconds} seconds'
+                      '${AppLocalizations.of(context)!.elapsedTime}: ${timerService.elapsedSeconds} ${AppLocalizations.of(context)!.seconds}'
                     ),
                     // const SizedBox(height: 20),
                     // Row(
