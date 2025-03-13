@@ -1,8 +1,12 @@
-import 'package:flutter/material.dart';
+
+import 'dart:developer' as dev;
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:stepit/classes/database.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/pages/homepage.dart';
 import 'package:stepit/classes/user.dart';
+import 'package:stepit/services/dialog_service.dart';
 import 'package:stepit/utils/utils.dart';
 import 'package:stepit/widgets/app_bar.dart';
 import 'package:stepit/widgets/background_gradient_container.dart';
@@ -43,30 +47,31 @@ class _IdentificationPageState extends State<IdentificationPage> {
   }
 
   void _showDialogMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Identification'),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            style: const ButtonStyle(
-              elevation: WidgetStatePropertyAll(4.0),
-              backgroundColor: WidgetStatePropertyAll(Color(0xFFC7F9CC))
-            ),
-            child: const Text(
-              'OK',
-              style: TextStyle(
-                color: Colors.black
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
+    DialogService().showSingleDialog(context, AppLocalizations.of(context)!.identificationTitle, message);
+    // showDialog(
+    //   context: context,
+    //   builder: (context) => AlertDialog(
+    //     title: Text(AppLocalizations.of(context)!.identificationTitle),
+    //     content: Text(message),
+    //     actions: <Widget>[
+    //       TextButton(
+    //         style: const ButtonStyle(
+    //           elevation: WidgetStatePropertyAll(4.0),
+    //           backgroundColor: WidgetStatePropertyAll(Color(0xFFC7F9CC))
+    //         ),
+    //         child: const Text(
+    //           'OK',
+    //           style: TextStyle(
+    //             color: Colors.black
+    //           ),
+    //         ),
+    //         onPressed: () {
+    //           Navigator.of(context).pop();
+    //         },
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 
   Future<void> _saveAndNavigateHome() async {
@@ -82,14 +87,14 @@ class _IdentificationPageState extends State<IdentificationPage> {
       }
 
     } catch (e) {
-      debugPrint("Error during async tasks: $e");
+      dev.log("Error during async tasks: $e");
     }
   }
 
   Future<bool> _saveToFirestore() async {
 
     if (_uniqueNumber == null) {
-      _showDialogMessage('There was an error getting unique number.');
+      _showDialogMessage(AppLocalizations.of(context)!.uniqueNumberGetError);
       return false;
     }
 
@@ -106,7 +111,7 @@ class _IdentificationPageState extends State<IdentificationPage> {
 
   String? validateUsername(String? value) {
 
-    const patternMessage = 'Username must contain only letters and numbers, and it must be between 4 and 16 characters long';
+    final patternMessage = AppLocalizations.of(context)!.userNameRegexMessage;
 
     if (value == null || value.isEmpty) {
       return patternMessage;
@@ -124,8 +129,8 @@ class _IdentificationPageState extends State<IdentificationPage> {
   Widget build(BuildContext context){
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: const StepItAppBar(
-        title: 'Welcome to StepIT',
+      appBar: StepItAppBar(
+        title: AppLocalizations.of(context)!.welcomeTo,
       ),
       body: BackgroundGradientContainer(
       child: Padding(
@@ -141,10 +146,10 @@ class _IdentificationPageState extends State<IdentificationPage> {
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   children: [
-                    const Text(
-                      'Enter a username to get started',
+                    Text(
+                      AppLocalizations.of(context)!.enterUserName,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 17,
                       ),
                     ),
@@ -170,14 +175,14 @@ class _IdentificationPageState extends State<IdentificationPage> {
                       future: _generateUniqueNumber(),
                       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Text('Unique number: loading...');
+                          return Text(AppLocalizations.of(context)!.loadingUniqueNumber);
                         } else {
                           if (snapshot.data != null) {
                             final userIdentifier = snapshot.data!;
                             _uniqueNumber = userIdentifier;
-                            return Text('Unique number: ${userIdentifier.toString().padLeft(6, '0')}');
+                            return Text('${AppLocalizations.of(context)!.uniqueNumber} ${userIdentifier.toString().padLeft(6, '0')}');
                           } else {
-                            return const Text('Unique number: not found');
+                            return Text(AppLocalizations.of(context)!.uniqueNumberNotFound);
                           }
                           
                         }
@@ -192,9 +197,9 @@ class _IdentificationPageState extends State<IdentificationPage> {
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: ElevatedButton(
                 onPressed: () => _saveAndNavigateHome(),
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.done,
+                  style: const TextStyle(
                     color: Colors.black
                   ),
                 ),

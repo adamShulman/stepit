@@ -1,8 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/pages/identification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stepit/services/dialog_service.dart';
 import 'package:stepit/widgets/app_bar.dart';
 import 'package:stepit/widgets/background_gradient_container.dart';
 
@@ -21,31 +23,32 @@ class _AgreementPageState extends State<AgreementPage> {
   Future<void> _saveAndNavigateToIdentification() async {
 
     if (_agreed == false) {
-      const message = 'Before you proceed, you must agree to our terms of service.';
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Terms of use'),
-          content: const Text(message),
-          actions: <Widget>[
-            TextButton(
-              style: const ButtonStyle(
-                elevation: WidgetStatePropertyAll(4.0),
-                backgroundColor: WidgetStatePropertyAll(Color(0xFFC7F9CC))
-              ),
-              child: const Text(
-                'OK',
-                style: TextStyle(
-                  color: Colors.black
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
+      final message = AppLocalizations.of(context)!.termsBeforeProceed;
+      DialogService().showSingleDialog(context, AppLocalizations.of(context)!.termsTitle, message);
+      // showDialog(
+      //   context: context,
+      //   builder: (context) => AlertDialog(
+      //     title: Text(AppLocalizations.of(context)!.termsTitle),
+      //     content: Text(message),
+      //     actions: <Widget>[
+      //       TextButton(
+      //         style: const ButtonStyle(
+      //           elevation: WidgetStatePropertyAll(4.0),
+      //           backgroundColor: WidgetStatePropertyAll(Color(0xFFC7F9CC))
+      //         ),
+      //         child: Text(
+      //           AppLocalizations.of(context)!.ok,
+      //           style: const TextStyle(
+      //             color: Colors.black
+      //           ),
+      //         ),
+      //         onPressed: () {
+      //           Navigator.of(context).pop();
+      //         },
+      //       ),
+      //     ],
+      //   ),
+      // );
       return ;
     }
 
@@ -68,8 +71,8 @@ class _AgreementPageState extends State<AgreementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const StepItAppBar(
-        title: 'Terms And Conditions',
+      appBar: StepItAppBar(
+        title: AppLocalizations.of(context)!.termsTitle,
       ),
       body: BackgroundGradientContainer(
         child: Padding(
@@ -77,10 +80,10 @@ class _AgreementPageState extends State<AgreementPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Welcome to Stepit',
+              Text(
+                AppLocalizations.of(context)!.welcomeTo,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 12.0,
@@ -140,11 +143,11 @@ class _AgreementPageState extends State<AgreementPage> {
                       });
                     },
                   ),
-                  const Flexible(
+                  Flexible(
                     child: Text(
-                      'I agree to the terms and conditions.',
+                      AppLocalizations.of(context)!.agreeToTerms,
                       maxLines: 2,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white
                       ),
                     ),
@@ -159,9 +162,9 @@ class _AgreementPageState extends State<AgreementPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: ElevatedButton(
                   onPressed: () => _saveAndNavigateToIdentification(),
-                  child: const Text(
-                    'Next',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.next,
+                    style: const TextStyle(
                       color: Colors.black
                     ),
                   ),

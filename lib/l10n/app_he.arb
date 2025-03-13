@@ -1,0 +1,84 @@
+{
+  "@@locale": "he",
+
+  "helloWorld": "Hello World!",
+  "@helloWorld": {},
+
+  "chooseChallengeTitle": "Choose a challenge",
+  "@chooseChallengeTitle": {},
+
+  "newChallenge": "New challenge",
+  "@newChallenge": {},
+
+  "completedChallenges": "Completed challenges",
+  "@completedChallenges": {},
+
+  "startChallenge": "Start challenge",
+  "@startChallenge": {},
+
+  "pauseChallenge": "Pause challenge",
+  "@pauseChallenge": {},
+
+  "stopChallenge": "Stop challenge",
+  "@stopChallenge": {},
+
+  "endChallenge": "End challenge",
+  "@endChallenge": {},
+
+  "resumeChallenge": "Resume challenge",
+  "@resumeChallenge": {},
+
+  "overviewTitle": "Overview",
+  "@overviewTitle": {},
+
+  "steps": "steps",
+  "@steps": {},
+
+  "points": "points",
+  "@points": {},
+
+  "level": "level",
+  "@level": {},
+
+  "termsTitle": "Terms And Conditions",
+  "@termsTitle": {},
+
+  "welcomeTo": "Welcome to Stepit",
+  "@welcomeTo": {},
+
+  "agreeToTerms": "I agree to the terms and conditions.",
+  "@agreeToTerms": {},
+
+  "next": "Next",
+  "@next": {},
+
+  "ok": "ok",
+  "@ok": {},
+
+  "termsBeforeProceed": "Before you proceed, you must agree to our terms of service.",
+  "@termsBeforeProceed": {},
+
+  "identificationTitle": "Identification",
+  "@identificationTitle": {},
+
+  "uniqueNumberGetError": "There was an error getting unique number.",
+  "@uniqueNumberGetError": {},
+
+  "userNameRegexMessage": "Username must contain only letters and numbers, and it must be between 4 and 16 characters long",
+  "@userNameRegexMessage": {},
+
+  "enterUserName": "Enter a username to get started",
+  "@enterUserName": {},
+
+  "loadingUniqueNumber": "Unique number: loading...",
+  "@loadingUniqueNumber": {},
+
+  "uniqueNumber": "Unique number:",
+  "@uniqueNumber": {},
+
+  "uniqueNumberNotFound": "Unique number: not found",
+  "@uniqueNumberNotFound": {},
+  
+  "done": "Done",
+  "@done": {}
+}

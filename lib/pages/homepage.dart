@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:stepit/classes/abstract_challenges/challenge.dart';
 import 'package:stepit/classes/challenge_singleton.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/pages/challenge_page.dart';
 import 'package:stepit/services/firebase_service.dart';
 import 'package:stepit/utils/utils.dart';
@@ -79,8 +80,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Scaffold(
       // backgroundColor: Colors.transparent,
       // extendBody: true,
-      appBar: const StepItAppBar(
-        title: 'Choose a challenge',
+      appBar: StepItAppBar(
+        title: AppLocalizations.of(context)!.helloWorld,
       ),
       body: BackgroundGradientContainer(
         child: SingleChildScrollView(

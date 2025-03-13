@@ -35,7 +35,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
-  intl: ^0.20.2
+  intl: any
   pedometer: ^4.0.2
   path_provider: ^2.1.5
   firebase_core: ^3.12.1
@@ -55,6 +55,8 @@ dependencies:
   latlong2: ^0.9.1
   flutter_confetti: ^0.4.0
   flutter_expandable_fab: ^2.3.0
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +85,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/images/walking_sausage.gif

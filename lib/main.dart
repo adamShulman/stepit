@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:stepit/classes/user.dart';
+import 'package:stepit/l10n/app_localizations.dart';
 import 'package:stepit/pages/data_loader.dart';
 import 'package:stepit/services/location_service.dart';
 import 'package:stepit/services/pedestrian_status_service.dart';
 import 'package:stepit/services/step_tracker_service.dart';
 import 'package:stepit/services/timer_service.dart';
+
+
 
 void main()  {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +42,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: const Locale('en'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('he')
+      ],
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: const Color.fromARGB(255, 130, 132, 133),
